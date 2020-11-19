@@ -61,6 +61,7 @@ pub async fn run(addr_clone: String,p1: mpsc::Sender<String>) -> Result<(), Box<
 
     loop {
         // Asynchronously wait for an inbound socket.
+        println!("rx got cli: {}",addr.to_string() );
         let (stream, addr) = listener.accept().await?;
         let p1clone = p1.clone();
             tokio::spawn(async move {

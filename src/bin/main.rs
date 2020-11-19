@@ -9,7 +9,7 @@ use tracing::info;
 
 
 use rustsys::datastore::{ets};
-use rustsys::connection::{rx,exter_in};
+use rustsys::connection::{rx,tx,exter_in};
 use rustsys::core::{coord};
 // use dns_lookup::{lookup_host, lookup_addr};
 // use get_local_ip::{local, network};
@@ -44,6 +44,7 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
     // let addr = addr + ":6142";
     println!("addr is: {}",addr);
     let (mut p1, mut c1) = mpsc::channel(32);
+    // let (mut p2, mut c2) = mpsc::channel(32);
 
     let ds = ets::Ets::new();
     let db = ets::SimpleEts::new();
@@ -67,7 +68,6 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
     });
 
 
-
     let db = ets::SimpleEts::new();
     let coord = tokio::spawn(async move { 
         coord::run(&mut c1,db.clone()).await;
@@ -76,9 +76,13 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
     let addr_clone = addr.clone();
     let p1_clone = p1.clone();
     let rx = tokio::spawn(async move { 
-        rx::run(addr_clone,p1.clone()).await;
+        rx::run(addr_clone,p1_clone).await;
     });
 
+    // let addr_clone = addr.clone();
+    // let tx = tokio::spawn(async move { 
+    //     tx::run(addr_clone,&mut c2).await;
+    // });
 
 
 
