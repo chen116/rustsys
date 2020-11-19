@@ -8,12 +8,15 @@ use tracing_subscriber;
 use tracing::info;
 
 
-use rustsys::datastore::{ets};
-use rustsys::connection::{rx,tx,exter_in};
+use rustsys::datastore::{ets,neighbour};
+use rustsys::connection::{rx,dy_tx,exter_in,tx};
 use rustsys::core::{coord};
 // use dns_lookup::{lookup_host, lookup_addr};
 // use get_local_ip::{local, network};
 use pnet::datalink;
+
+use tokio::sync::watch;
+
 
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn Error>>  {
@@ -49,10 +52,15 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
     // let addr = addr + ":6142";
     println!("addr is: {}",addr);
     let (mut p1, mut c1) = mpsc::channel(32);
-    // let (mut p2, mut c2) = mpsc::channel(32);
+    let (mut p2, mut c2) = mpsc::channel(32);
 
-    let ds = ets::Ets::new();
     let db = ets::SimpleEts::new();
+    let nb = neighbour::Neighbour::new();
+    // nb.set("hi".to_string(), p2);
+    // let p3 = nb.get(&("hi".to_string())).unwrap();
+    // let p4=p3.clone();
+    // nb.set("hi".to_string(), p4);
+    // println!("{:?}",nb.get(&("hi".to_string())).unwrap());
 
 
     // let addr = env::args()
@@ -73,10 +81,19 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
     });
 
 
+    let ( tx_dy_sender, mut tx_dy_watcher) = watch::channel("tx_dy");
     let db = ets::SimpleEts::new();
+    let nb_clone = nb.clone();
     let coord = tokio::spawn(async move { 
-        coord::run(&mut c1,db.clone()).await;
+        coord::run(&mut c1,db.clone(),nb_clone,p2).await;
     });
+
+    let nb_clone = nb.clone();
+    let dy_tx = tokio::spawn(async move { 
+        dy_tx::run(nb_clone,&mut c2).await;
+    });
+
+
 
     let addr_clone = addr.clone();
     let p1_clone = p1.clone();
@@ -84,7 +101,6 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
         rx::run(addr_clone,p1_clone).await;
     });
 
-    
     // let addr_clone = "10.67.1.41".to_string();
     // let tx = tokio::spawn(async move { 
     //     tx::run(addr_clone,&mut c2).await;

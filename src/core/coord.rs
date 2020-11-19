@@ -1,18 +1,50 @@
 
 use tokio::sync::{mpsc, Mutex};
-use crate::datastore::{ets};
+use crate::datastore::{ets,neighbour};
 
 
 use std::error::Error;
+use tokio::sync::watch;
 
 
 
-pub async fn run(c1: &mut mpsc::Receiver<String>, db: ets::SimpleEts) -> Result<(), Box<dyn Error>>  {
+pub async fn run(c1: &mut mpsc::Receiver<String>, db: ets::SimpleEts, 
+nb: neighbour::Neighbour, p2: mpsc::Sender<String>) 
+-> Result<(), Box<dyn Error>>  {
 
+
+
+    let nbb=nb.clone();
+
+    // println!("sender watch: {:?}",tx_dy_sender);
         while let Some(mesg) = c1.recv().await {
             println!("coord c1 got {:?}", mesg );
+             let mut parts = mesg.splitn(2, ' ');
 
-                let db = db.clone();
+             match parts.next() {
+                 Some("NEWHOST") => { 
+                    p2.send(parts.next().unwrap().to_string()).await;
+
+                  },
+                  Some("LIST") => { 
+
+    // println!("{:?}",nb.get(&("hi".to_string())).unwrap());
+
+    println!("LIST {:?}", nb.get(&(  parts.next().unwrap().to_string()   )).unwrap()   );
+                  
+                  },
+                 Some("SENDTO") => { 
+                    let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
+
+                     let p = nb.get(&(  part2s.next().unwrap().to_string()   )).unwrap() ;
+
+ 
+
+                        p.send(part2s.next().unwrap().to_string()).await;
+
+                  },
+                 _ => {               
+                      let db = db.clone();
 
                 // Like with other small servers, we'll `spawn` this client to ensure it
                 // runs concurrently with all other clients. The `move` keyword is used
@@ -21,7 +53,6 @@ pub async fn run(c1: &mut mpsc::Receiver<String>, db: ets::SimpleEts) -> Result<
                     // Since our protocol is line-based we use `tokio_codecs`'s `LineCodec`
                     // to convert our stream of bytes, `socket`, into a `Stream` of lines
                     // as well as convert our line based responses into a stream of bytes.
-                  
 
                     // Here for every line we get back from the `Framed` decoder,
                     // we parse the request, and if it's valid we generate a response
@@ -34,7 +65,18 @@ pub async fn run(c1: &mut mpsc::Receiver<String>, db: ets::SimpleEts) -> Result<
                     println!("response: {}",response);
 
                     // The connection will be closed at this point as `lines.next()` has returned `None`.
-                });
+                });}
+             }
+
+    
+
+                
+                // let db = db.clone();
+                // tokio::spawn(async move {
+                //     let response = db.handle_request(&mesg.as_str());
+                //     let response = response.serialize();
+                //     println!("response: {}",response);
+                // });
 
             // victx.send(mesg).await;
             // handle details
@@ -43,3 +85,34 @@ pub async fn run(c1: &mut mpsc::Receiver<String>, db: ets::SimpleEts) -> Result<
 
 Ok(())
 }
+
+// fn parse(input: &str) -> Result<Request, String> {
+//         let mut parts = input.splitn(3, ' ');
+//         match parts.next() {
+//             Some("GET") => {
+//                 let key = parts.next().ok_or("GET must be followed by a key")?;
+//                 if parts.next().is_some() {
+//                     return Err("GET's key must not be followed by anything".into());
+//                 }
+//                 Ok(Request::Get {
+//                     key: key.to_string(),
+//                 })
+//             }
+//             Some("SET") => {
+//                 let key = match parts.next() {
+//                     Some(key) => key,
+//                     None => return Err("SET must be followed by a key".into()),
+//                 };
+//                 let value = match parts.next() {
+//                     Some(value) => value,
+//                     None => return Err("SET needs a value".into()),
+//                 };
+//                 Ok(Request::Set {
+//                     key: key.to_string(),
+//                     value: value.to_string(),
+//                 })
+//             }
+//             Some(cmd) => Err(format!("unknown command: {}", cmd)),
+//             None => Err("empty input".into()),
+//         }
+//     }
