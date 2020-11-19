@@ -13,6 +13,7 @@ use std::io;
 use tokio::sync::mpsc;
 
 use structopt::StructOpt;
+use rustsys::{EXTER_IN_PORT};
 
 
 #[derive(StructOpt, Debug)]
@@ -23,6 +24,9 @@ struct Remote_host {
 
     #[structopt(name = "host", long = "--host", default_value = "127.0.0.1")]
     host: String,
+
+    #[structopt(name = "port", long = "--port", default_value = EXTER_IN_PORT)]
+    port: String,
 
 
 }
@@ -41,10 +45,10 @@ pub async fn main() ->Result<(), Box<dyn Error>> {
     // Note that this is the Tokio TcpStream, which is fully async.
     let (mut victx, mut vicrx) = mpsc::channel(32);
 
-    let add = format!("{}:1024", remote_host.host.as_str());
-    println!("connecting to {}",add);
+    let addr = format!("{}:8081", remote_host.host.as_str());
+    println!("connecting to {}",addr);
 
-    let mut stream = TcpStream::connect(add).await?;
+    let mut stream = TcpStream::connect(addr).await?;
 
 
     let (mut r, mut w) = stream.into_split();

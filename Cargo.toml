@@ -21,7 +21,8 @@ httparse = "1.0"
 time = "0.1"
 structopt = "0.3.14"
 dns-lookup = "1.0.5"
-
+get_local_ip = "0.2.1"
+pnet = "0.26.0"
 [[bin]]
 name = "server"
 path = "src/bin/server.rs"

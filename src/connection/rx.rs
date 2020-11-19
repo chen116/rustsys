@@ -13,6 +13,7 @@ use std::net::SocketAddr;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context, Poll};
+use crate::{RX_PORT};
 
 
 pub async fn hi() -> Result<(), Box<dyn Error>>   {
@@ -41,18 +42,18 @@ impl Shared {
         // }
     }
 }
-pub async fn run(p1: mpsc::Sender<String>) -> Result<(), Box<dyn Error>> {
+pub async fn run(addr_clone: String,p1: mpsc::Sender<String>) -> Result<(), Box<dyn Error>> {
     // Allow passing an address to listen on as the first argument of this
     // program, but otherwise we'll just set up our TCP listener on
     // 127.0.0.1:8080 for connections.
-    let addr =  "127.0.0.1:8082".to_string();
+    let addr =  addr_clone+":"+RX_PORT;
 
     // Next up we create a TCP listener which will listen for incoming
     // connections. This TCP listener is bound to the address we determined
     // above and must be associated with an event loop.
     let listener = TcpListener::bind(&addr).await?;
 
-    println!("exter_in server running on {}", addr);
+    println!("rx server running on {}", addr);
 
 
     
@@ -67,36 +68,14 @@ pub async fn run(p1: mpsc::Sender<String>) -> Result<(), Box<dyn Error>> {
                 while let Some(msg) = lines.next().await {
                     match msg {
                         Ok(txt) => {
-                            println!("exter in got:{}",txt);
+                            println!("rx got:{}",txt);
                             p1clone.send(txt).await.unwrap();
                         },
-                        _ => println!("exter in get nuffin"),
+                        _ => println!("rx get nuffin"),
                     }
                 }
         });
     }
 
     Ok(())
-}
-
-async fn process(
-    state: Arc<Mutex<Shared>>,
-    stream: TcpStream,
-    addr: SocketAddr,
-) -> Result<(), Box<dyn Error>> {
-
-
-    let mut lines = Framed::new(stream, LinesCodec::new());
-    while let Some(msg) = lines.next().await {
-
-
-    }
-
-
-    // Send a prompt to the client to enter their username.
-    lines.send("Please enter your username:").await?;
-
-
-
-Ok(())
 }
