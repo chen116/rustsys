@@ -45,7 +45,7 @@ pub async fn main() ->Result<(), Box<dyn Error>> {
     // Note that this is the Tokio TcpStream, which is fully async.
     let (mut victx, mut vicrx) = mpsc::channel(32);
 
-    let addr = format!("{}:8081", remote_host.host.as_str());
+    let addr = format!("{}:{}", remote_host.host.as_str(),remote_host.port.as_str());
     println!("connecting to {}",addr);
 
     let mut stream = TcpStream::connect(addr).await?;
