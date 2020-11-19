@@ -28,17 +28,21 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
 
     let mut addr = "127.0.0.1".to_string();
     for iface in datalink::interfaces() {
-        println!("{:?}",iface);
+        // println!("{:?}",iface);
         match iface.is_up(){
             true   => {
-                match iface.ips[0].ip().to_string().contains("127.") || iface.ips[0].ip().to_string().contains("172.") {
-                    false => 
-                    { 
-                        addr = iface.ips[0].ip().to_string();
-                    },
-                    _ => {}
+                match iface.ips.len() {
+                    0 => {},
+                   _ => match iface.ips[0].ip().to_string().contains("127.") || iface.ips[0].ip().to_string().contains("172.") {
+                        false => 
+                        { 
+                            addr = iface.ips[0].ip().to_string();
+                        },
+                        _ => {}
+                        }
                     }
                 },
+
             _ => {}
         }
     }
