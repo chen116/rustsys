@@ -12,17 +12,39 @@ use std::io;
 
 use tokio::sync::mpsc;
 
+use structopt::StructOpt;
+
+
+#[derive(StructOpt, Debug)]
+#[structopt(name = "fogsys-server", version = env!("CARGO_PKG_VERSION"), author = env!("CARGO_PKG_AUTHORS"), about = "A Redis server")]
+struct Remote_host {
+
+
+
+    #[structopt(name = "host", long = "--host", default_value = "127.0.0.1")]
+    host: String,
+
+
+}
+
+
 
 #[tokio::main]
 pub async fn main() ->Result<(), Box<dyn Error>> {
+
+    let remote_host = Remote_host::from_args();
+
+
+
     // Open a TCP stream to the socket address.
     //
     // Note that this is the Tokio TcpStream, which is fully async.
     let (mut victx, mut vicrx) = mpsc::channel(32);
 
+    let add = format!("{}:8080", remote_host.host.as_str());
+    println!("connecting to {}",add);
 
-
-    let mut stream = TcpStream::connect("127.0.0.1:8080").await?;
+    let mut stream = TcpStream::connect(add).await?;
 
 
     let (mut r, mut w) = stream.into_split();
