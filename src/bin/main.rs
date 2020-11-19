@@ -11,11 +11,16 @@ use tracing::info;
 use rustsys::datastore::{ets};
 use rustsys::connection::{rx,exter_in};
 use rustsys::core::{coord};
-
+use dns_lookup::{lookup_host, lookup_addr};
 
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn Error>>  {
 
+    let hostname = "localhost";
+  let ips: Vec<std::net::IpAddr> = lookup_host(hostname).unwrap();
+  for ip in ips.iter(){
+println!("ip:{}",ip.to_string());
+  } 
 
     let (mut p1, mut c1) = mpsc::channel(32);
 
