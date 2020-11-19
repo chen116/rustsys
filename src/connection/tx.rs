@@ -15,13 +15,15 @@ use crate::{TX_PORT,RX_PORT};
 use tokio::io::AsyncWriteExt;
 
 pub async fn run(addr_clone: String, c2: &mut mpsc::Receiver<String>) -> Result<(), Box<dyn Error>> {
-    let addr =  addr_clone+":"+TX_PORT;
+    let addr =  addr_clone+":"+RX_PORT;
 
     // Open a TCP stream to the socket address.
     //
     // Note that this is the Tokio TcpStream, which is fully async.
     // let (mut victx, mut vicrx) = mpsc::channel(32);
 
+            let mut input = String::new();
+            io::stdin().read_line(&mut input).unwrap();
 
     let mut stream = TcpStream::connect(&addr).await?;
 

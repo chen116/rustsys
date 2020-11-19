@@ -84,7 +84,8 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
         rx::run(addr_clone,p1_clone).await;
     });
 
-    // let addr_clone = addr.clone();
+    
+    // let addr_clone = "10.67.1.41".to_string();
     // let tx = tokio::spawn(async move { 
     //     tx::run(addr_clone,&mut c2).await;
     // });
