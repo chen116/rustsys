@@ -80,8 +80,13 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
         exter_in::run(addr_clone,p1_clone).await;
     });
 
+    let addr_clone = addr.clone();
+    let p1_clone = p1.clone();
+    let rx = tokio::spawn(async move { 
+        rx::run(addr_clone,p1_clone).await;
+    });
 
-    let ( tx_dy_sender, mut tx_dy_watcher) = watch::channel("tx_dy");
+
     let db = ets::SimpleEts::new();
     let nb_clone = nb.clone();
     let coord = tokio::spawn(async move { 
@@ -95,11 +100,7 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
 
 
 
-    let addr_clone = addr.clone();
-    let p1_clone = p1.clone();
-    let rx = tokio::spawn(async move { 
-        rx::run(addr_clone,p1_clone).await;
-    });
+
 
     // let addr_clone = "10.67.1.41".to_string();
     // let tx = tokio::spawn(async move { 

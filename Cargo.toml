@@ -23,6 +23,12 @@ structopt = "0.3.14"
 dns-lookup = "1.0.5"
 get_local_ip = "0.2.1"
 pnet = "0.26.0"
+tonic = "0.3"
+prost = "0.6"
+
+[build-dependencies]
+tonic-build = "0.3"
+
 [[bin]]
 name = "server"
 path = "src/bin/server.rs"
@@ -31,3 +37,9 @@ path = "src/bin/server.rs"
 [[bin]]
 name = "main"
 path = "src/bin/main.rs"
+
+[[bin]] # Bin to run the HelloWorld gRPC server
+name = "gs"
+path = "src/server.rs"
+
+

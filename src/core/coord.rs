@@ -9,7 +9,7 @@ use tokio::sync::watch;
 
 
 pub async fn run(c1: &mut mpsc::Receiver<String>, db: ets::SimpleEts, 
-nb: neighbour::Neighbour, p2: mpsc::Sender<String>) 
+nb: neighbour::Neighbour, dy_tx_p: mpsc::Sender<String>) 
 -> Result<(), Box<dyn Error>>  {
 
 
@@ -23,49 +23,35 @@ nb: neighbour::Neighbour, p2: mpsc::Sender<String>)
 
              match parts.next() {
                  Some("NEWHOST") => { 
-                    p2.send(parts.next().unwrap().to_string()).await;
-
+                    dy_tx_p.send(parts.next().unwrap().to_string()).await;
                   },
                   Some("LIST") => { 
-
-    // println!("{:?}",nb.get(&("hi".to_string())).unwrap());
-
-    println!("LIST {:?}", nb.get(&(  parts.next().unwrap().to_string()   )).unwrap()   );
-                  
+                    // println!("{:?}",nb.get(&("hi".to_string())).unwrap());
+                    println!("LIST {:?}", nb.get(&(  parts.next().unwrap().to_string()   )).unwrap()   );
                   },
                  Some("SENDTO") => { 
                     let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
-
-                     let p = nb.get(&(  part2s.next().unwrap().to_string()   )).unwrap() ;
-
- 
-
-                        p.send(part2s.next().unwrap().to_string()).await;
-
+                    let tx_p = nb.get(&(  part2s.next().unwrap().to_string()   )).unwrap() ;
+                    tx_p.send(part2s.next().unwrap().to_string()).await;
                   },
                  _ => {               
-                      let db = db.clone();
-
-                // Like with other small servers, we'll `spawn` this client to ensure it
-                // runs concurrently with all other clients. The `move` keyword is used
-                // here to move ownership of our db handle into the async closure.
-                tokio::spawn(async move {
-                    // Since our protocol is line-based we use `tokio_codecs`'s `LineCodec`
-                    // to convert our stream of bytes, `socket`, into a `Stream` of lines
-                    // as well as convert our line based responses into a stream of bytes.
-
-                    // Here for every line we get back from the `Framed` decoder,
-                    // we parse the request, and if it's valid we generate a response
-                    // based on the values in the database.
-
-                    let response = db.handle_request(&mesg.as_str());
-
-                    let response = response.serialize();
-
-                    println!("response: {}",response);
+                        let db = db.clone();
+                        // Like with other small servers, we'll `spawn` this client to ensure it
+                        // runs concurrently with all other clients. The `move` keyword is used
+                        // here to move ownership of our db handle into the async closure.
+                        tokio::spawn(async move {
+                        // Since our protocol is line-based we use `tokio_codecs`'s `LineCodec`
+                        // to convert our stream of bytes, `socket`, into a `Stream` of lines
+                        // as well as convert our line based responses into a stream of bytes.
+                        // Here for every line we get back from the `Framed` decoder,
+                        // we parse the request, and if it's valid we generate a response
+                        // based on the values in the database.
+                        let response = db.handle_request(&mesg.as_str());
+                        let response = response.serialize();
+                        println!("response: {}",response);
 
                     // The connection will be closed at this point as `lines.next()` has returned `None`.
-                });}
+                    });}
              }
 
     

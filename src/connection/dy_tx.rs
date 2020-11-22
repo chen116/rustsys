@@ -18,10 +18,10 @@ use tokio::sync::watch;
 
 // use tokio::io::AsyncWriteExt;
 
-pub async fn run(nb: neighbour::Neighbour,c2: &mut mpsc::Receiver<String>,) -> Result<(), Box<dyn Error>> {
+pub async fn run(nb: neighbour::Neighbour,dy_tx_c: &mut mpsc::Receiver<String>,) -> Result<(), Box<dyn Error>> {
 
 
-        while let Some(remote_host) = c2.recv().await {
+        while let Some(remote_host) = dy_tx_c.recv().await {
             println!("dy_tx going to connect with {:?}", remote_host );
             // let addr =  remote_host+":"+RX_PORT;
 

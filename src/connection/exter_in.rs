@@ -27,16 +27,12 @@ pub async fn run(addr_clone: String, p1: mpsc::Sender<String>) -> Result<(), Box
     // above and must be associated with an event loop.
     let listener = TcpListener::bind(&addr).await?;
 
-
-
     println!("exter_in server running on {}", addr);
-    
-
 
     loop {
         // Asynchronously wait for an inbound socket.
         let (stream, addr) = listener.accept().await?;
-        println!("{}",addr.to_string() );
+        println!("exter_in got cli: {}",addr.to_string() );
         let p1clone = p1.clone();
             tokio::spawn(async move {
                 let mut lines = Framed::new(stream, LinesCodec::new());
