@@ -30,5 +30,17 @@ impl Neighbour {
         state.get(key).map(|sender| sender.clone())
     }
 
+    pub fn list(&self)
+    {
+        let state = self.shared.lock().unwrap();
+        for (key, value) in state.iter() {
+        println!("{:?} / {:?}", key, value);
+    }
+}
   
+}
+
+fn do_it(map: &mut HashMap<String, String>) {
+
+    map.clear();
 }

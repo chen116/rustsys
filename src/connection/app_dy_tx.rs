@@ -13,25 +13,26 @@ use tokio_util::codec::{BytesCodec, FramedRead, FramedWrite};
 use tokio::sync::mpsc;
 use crate::{TX_PORT,RX_PORT};
 use crate::datastore::{ets,neighbour};
-use crate::connection::{tx};
+use crate::connection::{app_tx};
 use tokio::sync::watch;
 
 // use tokio::io::AsyncWriteExt;
 
-pub async fn run(nb: neighbour::Neighbour,dy_tx_c: &mut mpsc::Receiver<String>,) -> Result<(), Box<dyn Error>> {
+pub async fn run(apps: neighbour::Neighbour,dy_app_tx: &mut mpsc::Receiver<String>,) -> Result<(), Box<dyn Error>> {
 
 
-        while let Some(remote_host) = dy_tx_c.recv().await {
-            println!("dy_tx going to connect with {:?}", remote_host );
-            // let addr =  remote_host+":"+RX_PORT;
+        while let Some(remote_port) = dy_app_tx.recv().await {
+            println!("dy_tx going to connect with {:?}", remote_port );
+            // let addr =  remote_port+":"+RX_PORT;
 
             let (mut p, mut c) = mpsc::channel(32);
-            // let clone_host = remote_host.clone();
-            nb.set(remote_host.clone(), p);
+            // let clone_host = remote_port.clone();
+            apps.set(remote_port.clone(), p);
+
 
             let tx = tokio::spawn(async move { 
                 
-                tx::run(remote_host.to_string(),&mut c).await;
+                app_tx::run(remote_port.to_string(),&mut c).await;
             });
 
             // handle details

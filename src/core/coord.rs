@@ -5,11 +5,20 @@ use crate::datastore::{ets,neighbour};
 
 use std::error::Error;
 use tokio::sync::watch;
-
+use std::process::Command;
+async fn create_new_app(port_num: String) -> String {
+   let output =  Command::new("sh")
+            .arg("-c")
+            .arg("echo hello")
+            .output()
+            .expect("failed to execute process");
+    "the result of the computation".to_string()
+}
 
 
 pub async fn run(c1: &mut mpsc::Receiver<String>, db: ets::SimpleEts, 
-nb: neighbour::Neighbour, dy_tx_p: mpsc::Sender<String>) 
+nb: neighbour::Neighbour, dy_tx_p: mpsc::Sender<String> , 
+apps: neighbour::Neighbour ,app_dy_tx_p:  mpsc::Sender<String> ) 
 -> Result<(), Box<dyn Error>>  {
 
 
@@ -26,12 +35,30 @@ nb: neighbour::Neighbour, dy_tx_p: mpsc::Sender<String>)
                     dy_tx_p.send(parts.next().unwrap().to_string()).await;
                   },
                   Some("LIST") => { 
+
+
+                      nb.list();
                     // println!("{:?}",nb.get(&("hi".to_string())).unwrap());
-                    println!("LIST {:?}", nb.get(&(  parts.next().unwrap().to_string()   )).unwrap()   );
+                    // println!("LIST {:?}", nb.get(&(  parts.next().unwrap().to_string()   )).unwrap()   );
                   },
-                 Some("SENDTO") => { 
+                 Some("SEND2HOST") => { 
                     let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
                     let tx_p = nb.get(&(  part2s.next().unwrap().to_string()   )).unwrap() ;
+                    tx_p.send(part2s.next().unwrap().to_string()).await;
+                  },
+                 Some("NEWAPP") => { 
+                    let port_num = parts.next().unwrap().to_string();
+                    let port_num_clone = port_num.clone();
+                    let join_handle = tokio::spawn(async move {
+                        create_new_app(port_num_clone).await
+                    });
+                    let res = join_handle.await.unwrap();
+  
+                    app_dy_tx_p.send(port_num).await;
+                  },
+                 Some("SEND2APP") => { 
+                    let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
+                    let tx_p = apps.get(&(  part2s.next().unwrap().to_string()   )).unwrap() ;
                     tx_p.send(part2s.next().unwrap().to_string()).await;
                   },
                  _ => {               

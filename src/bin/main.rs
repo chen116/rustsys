@@ -9,7 +9,7 @@ use tracing::info;
 
 
 use rustsys::datastore::{ets,neighbour};
-use rustsys::connection::{rx,dy_tx,exter_in,tx};
+use rustsys::connection::{app_rx,rx,app_dy_tx,dy_tx,exter_in,tx};
 use rustsys::core::{coord};
 // use dns_lookup::{lookup_host, lookup_addr};
 // use get_local_ip::{local, network};
@@ -53,9 +53,11 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
     println!("addr is: {}",addr);
     let (mut p1, mut c1) = mpsc::channel(32);
     let (mut p2, mut c2) = mpsc::channel(32);
+    let (mut p3, mut c3) = mpsc::channel(32);
 
     let db = ets::SimpleEts::new();
     let nb = neighbour::Neighbour::new();
+    let apps = neighbour::Neighbour::new();
     // nb.set("hi".to_string(), p2);
     // let p3 = nb.get(&("hi".to_string())).unwrap();
     // let p4=p3.clone();
@@ -86,18 +88,30 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
         rx::run(addr_clone,p1_clone).await;
     });
 
+    let addr_clone = addr.clone();
+    let p1_clone = p1.clone();
+    let app_rx = tokio::spawn(async move { 
+        app_rx::run(addr_clone,p1_clone).await;
+    });
 
     let db = ets::SimpleEts::new();
     let nb_clone = nb.clone();
+    let apps_clone = apps.clone();
     let coord = tokio::spawn(async move { 
-        coord::run(&mut c1,db.clone(),nb_clone,p2).await;
+        coord::run(&mut c1,db.clone(),nb_clone,p2,apps_clone,p3).await;
     });
+
+
 
     let nb_clone = nb.clone();
     let dy_tx = tokio::spawn(async move { 
         dy_tx::run(nb_clone,&mut c2).await;
     });
 
+    let apps_clone = apps.clone();
+    let app_dy_tx = tokio::spawn(async move { 
+        app_dy_tx::run(apps_clone,&mut c3).await;
+    });
 
 
 
