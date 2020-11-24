@@ -36,7 +36,7 @@ apps: neighbour::Neighbour ,app_dy_tx_p:  mpsc::Sender<String> )
                   },
                   Some("LIST") => { 
 
-                      println!("Connected Cloudlets:")
+                      println!("Connected Cloudlets:");
                       nb.list();
                     // println!("{:?}",nb.get(&("hi".to_string())).unwrap());
                     // println!("LIST {:?}", nb.get(&(  parts.next().unwrap().to_string()   )).unwrap()   );
