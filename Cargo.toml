@@ -78,5 +78,6 @@ prost-types = { git = "https://github.com/danburkert/prost" }
 #listenfd = "0.3"
 
 [build-dependencies]
-tonic-build = { path = "/home/vic/rust/tonic/tonic-build", features = ["prost"] }
+#tonic-build = { path = "/home/vic/rust/tonic/tonic-build", features = ["prost"] }
+tonic-build = { path = "../tonic/tonic-build", features = ["prost"] }
 
