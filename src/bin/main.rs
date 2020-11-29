@@ -18,6 +18,15 @@ use pnet::datalink;
 use tokio::sync::watch;
 
 
+
+use hello_world::greeter_client::GreeterClient;
+use hello_world::HelloRequest;
+
+pub mod hello_world {
+    tonic::include_proto!("helloworld");
+}
+
+
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn Error>>  {
 
@@ -111,9 +120,20 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
     let apps_clone = apps.clone();
     let app_dy_tx = tokio::spawn(async move { 
         app_dy_tx::run(apps_clone,&mut c3).await;
-    });
+  
+    }); 
 
+    // tokio::spawn(async move {
+    //     // Process each socket concurrently.
+    //     let mut client = GreeterClient::connect("http://[::1]:50051").await.unwrap();
+    //     let request = tonic::Request::new(HelloRequest {
+    //     name: "10".to_string(),
+    //     });
+    //     let response = client.say_hello_again(request).await.unwrap();
+    //     println!("RESPONSE={:?}", response.into_inner().message);
+    // });
 
+ 
 
 
     // let addr_clone = "10.67.1.41".to_string();
