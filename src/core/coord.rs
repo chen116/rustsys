@@ -86,7 +86,7 @@ apps: app::App  )
 
                   },
                   Some("SEND2APP") => { 
-                    let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
+                    let mut part2s =  (parts.next().unwrap()).splitn(3, ' ');
 
                     let appname =  part2s.next().unwrap().to_string() ;
                     let value =  part2s.next().unwrap().to_string() ;
@@ -104,6 +104,7 @@ apps: app::App  )
                             });
                             let response = client.say_hello(request).await.unwrap();
                             println!("RESPONSE {}({})={:?}", appname,value,response.into_inner().message);
+                           
                         });
                       }
                       else
@@ -126,7 +127,7 @@ apps: app::App  )
 
                     }else{
                     let tx_p = nb.get(&(host)).unwrap() ;
-                    let info = format!("SEND2APP {} {}",appname,value);
+                    let info = format!("SEND2APP {} {} {}",appname,value,myaddr.clone());
 
                     tx_p.send( info.to_string() ).await;
                     }
