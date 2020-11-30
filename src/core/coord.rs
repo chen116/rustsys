@@ -110,7 +110,7 @@ apps: app::App  )
                       {
                             tokio::spawn(async move {
                             // Process each socket concurrently.
-                            let mut client = GreeterClient::connect("http://localhost:50050").await.unwrap();
+                            let mut client = GreeterClient::connect("http://localhost:50051").await.unwrap();
                             let request = tonic::Request::new(HelloRequest {
                             name: value,
                             });
