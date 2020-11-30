@@ -42,7 +42,7 @@ impl Neighbour {
         let state = self.shared.lock().unwrap();
         for (key, value) in state.iter() {
             let info = format!("UPDATEAPPS {} {}",appname,host);
-            value.send(info.to_string()).await;
+            value.send(info.to_string()).await.unwrap();
         }
     }
   
