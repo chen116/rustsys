@@ -7,6 +7,11 @@ use std::error::Error;
 use tokio::sync::watch;
 use std::process::Command;
 
+use hello_world::greeter_client::GreeterClient;
+use hello_world::HelloRequest;
+pub mod hello_world {
+    tonic::include_proto!("helloworld");
+}
 
 
 async fn create_new_app(app_name: String) -> String {
@@ -90,6 +95,35 @@ apps: app::App  )
 
                     if host == myaddr {
                       println!("run here");
+                      if appname == "pi" {
+                            tokio::spawn(async move {
+                            // Process each socket concurrently.
+                            let mut client = GreeterClient::connect("http://localhost:50050").await.unwrap();
+                            let request = tonic::Request::new(HelloRequest {
+                            name: value,
+                            });
+                            let response = client.say_hello(request).await.unwrap();
+                            println!("RESPONSE={:?}", response.into_inner().message);
+                        });
+                      }
+                      else
+                      {
+                            tokio::spawn(async move {
+                            // Process each socket concurrently.
+                            let mut client = GreeterClient::connect("http://localhost:50050").await.unwrap();
+                            let request = tonic::Request::new(HelloRequest {
+                            name: value,
+                            });
+                            let response = client.say_hello(request).await.unwrap();
+                            println!("RESPONSE={:?}", response.into_inner().message);
+                        });
+
+
+                      }
+
+
+
+
                     }else{
                     let tx_p = nb.get(&(host)).unwrap() ;
                     let info = format!("SEND2APP {} {}",appname,value);
