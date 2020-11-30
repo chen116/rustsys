@@ -48,7 +48,7 @@ apps: app::App  )
                   },
                   Some("APPS") => { 
 
-                      println!("Connected Cloudlets:");
+                      println!("Available Apps:");
                       apps.list();
                     // println!("{:?}",nb.get(&("hi".to_string())).unwrap());
                     // println!("LIST {:?}", nb.get(&(  parts.next().unwrap().to_string()   )).unwrap()   );
@@ -66,9 +66,12 @@ apps: app::App  )
                     });
                     let res = join_handle.await.unwrap();
                     println!("{}",res );
+                    apps.set(app_name.clone(),myaddr.clone());
+                    nb.broadcast( app_name,myaddr.clone());
   
                   },
-                 Some("SEND2APP") => { 
+                 Some("UPDATEAPPS") => { 
+                   apps.set(parts.next().unwrap().to_string(),parts.next().unwrap().to_string()   );
 
                   },
                  _ => {               
