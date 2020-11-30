@@ -38,7 +38,7 @@ impl Neighbour {
         }
     }
 
-    async pub  fn broadcast(&self, appname: String, host: String){
+     pub  fn broadcast(&self, appname: String, host: String){
         let state = self.shared.lock().unwrap();
         for (key, value) in state.iter() {
             let info = format!("UPDATEAPPS {} {}",appname,host);
