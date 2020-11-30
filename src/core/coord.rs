@@ -104,6 +104,7 @@ apps: app::App  )
                     if host == myaddr {
                       println!("run here");
                       if appname == "pi".to_string() {
+                        println!("{} {}",appname,value);
                             tokio::spawn(async move {
                             // Process each socket concurrently.
                             let mut client = GreeterClient::connect("http://localhost:50050").await.unwrap();
