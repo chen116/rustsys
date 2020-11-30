@@ -75,8 +75,9 @@ apps: app::App  )
   
                   },
                  Some("UPDATEAPPS") => { 
+                   let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
                   //  println!("{} {}",parts.next().unwrap().to_string(),parts.next().unwrap().to_string());
-                   apps.set(parts.next().to_string(),parts.next().to_string()   );
+                   apps.set(part2s.next().unwrap().to_string(),part2s.next().unwrap().to_string()   );
 
                   },
                  _ => {               
