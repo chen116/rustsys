@@ -3,7 +3,7 @@ use std::collections::{BTreeMap, HashMap};
 use std::sync::{Arc, Mutex};
 use tokio::sync::{mpsc};
 
-
+use  std::vec::Vec;
 
 #[derive(Debug, Clone)]
 pub struct Neighbour {
@@ -38,12 +38,14 @@ impl Neighbour {
         }
     }
 
-     pub  fn broadcast(&self, appname: String, host: String){
+     pub  fn all_neighbours(&self)->Vec<mpsc::Sender<String>>{
         let state = self.shared.lock().unwrap();
+        let mut vec = Vec::new();
         for (key, value) in state.iter() {
-            let info = format!("UPDATEAPPS {} {}",appname,host);
-            value.send(info.to_string()).await.unwrap();
+            // let info = format!("UPDATEAPPS {} {}",appname,host);
+            vec.push(value.clone());
         }
+        vec
     }
   
 }

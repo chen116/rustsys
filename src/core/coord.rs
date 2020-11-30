@@ -67,7 +67,11 @@ apps: app::App  )
                     let res = join_handle.await.unwrap();
                     println!("{}",res );
                     apps.set(app_name.clone(),myaddr.clone());
-                    nb.broadcast( app_name,myaddr.clone());
+                    let info = format!("UPDATEAPPS {} {}",app_name.clone(),myaddr.clone());
+                    let mut tx_ps = nb.all_neighbours();
+                    while let Some(tx_p) = tx_ps.pop() {
+                        tx_p.send(info.to_string()).await;
+                    }
   
                   },
                  Some("UPDATEAPPS") => { 
