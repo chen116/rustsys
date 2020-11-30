@@ -80,23 +80,18 @@ apps: app::App  )
   
                   },
                  Some("UPDATEAPPS") => { 
-                   let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
+                   let mut part2s =  (parts.next().unwrap()).splitn(3, ' ');
                   //  println!("{} {}",parts.next().unwrap().to_string(),parts.next().unwrap().to_string());
                    apps.set(part2s.next().unwrap().to_string(),part2s.next().unwrap().to_string()   );
 
                   },
                   Some("SEND2APP") => { 
-                    let mut part2s =  (parts.next().unwrap()).splitn(3, ' ');
+                    let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
 
                     let appname =  part2s.next().unwrap().to_string() ;
                     let value =  part2s.next().unwrap().to_string() ;
 
 
-                    let originHost = part2s.next() ;
-                    match originHost {
-                      Some(inner) => println!("oroginal HOST {}",inner.to_string()),
-                      None => println!("no host"),
-                    }
 
                     //  println!("{} {}",parts.next().unwrap().to_string(),parts.next().unwrap().to_string());
                     let host = apps.get(&(appname) ).unwrap() ;
@@ -104,7 +99,6 @@ apps: app::App  )
                     if host == myaddr {
                       println!("run here");
                       if appname == "pi".to_string() {
-                        println!("{} {}",appname,value);
                             tokio::spawn(async move {
                             // Process each socket concurrently.
                             let mut client = GreeterClient::connect("http://localhost:50050").await.unwrap();
@@ -114,6 +108,7 @@ apps: app::App  )
                             let response = client.say_hello(request).await.unwrap();
                             println!("RESPONSE {}({})={:?}", appname,value,response.into_inner().message);
                           
+
                         });
                       }
                       else
@@ -126,6 +121,17 @@ apps: app::App  )
                             });
                             let response = client.say_hello(request).await.unwrap();
                             println!("RESPONSE {}({})={:?}", appname,value,response.into_inner().message);
+                          let originHost = part2s.next() ;
+                          match originHost {
+                            Some(inner) =>
+                            {
+                             println!("from HOST {}",inner.to_string())
+                             
+                            }
+                             ,
+                            None => println!("from here"),
+                          }
+                       
                         });
 
 
