@@ -80,6 +80,22 @@ apps: app::App  )
                    apps.set(part2s.next().unwrap().to_string(),part2s.next().unwrap().to_string()   );
 
                   },
+                  Some("SEND2APPS") => { 
+                    let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
+
+                    let appname =  part2s.next().unwrap().to_string() ;
+                    //  println!("{} {}",parts.next().unwrap().to_string(),parts.next().unwrap().to_string());
+                    let host = apps.get(&(appname) ).unwrap() ;
+
+                    if host == myaddr {
+                      println!("run here")
+                    }else{
+                    let tx_p = nb.get(&(host)).unwrap() ;
+                    tx_p.send(part2s.next().unwrap().to_string()).await;
+                    }
+
+
+                  },
                  _ => {               
                         let db = db.clone();
                         // Like with other small servers, we'll `spawn` this client to ensure it
