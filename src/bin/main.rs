@@ -17,7 +17,7 @@ use pnet::datalink;
 
 use tokio::sync::watch;
 
-
+use subprocess::Exec
 
 use hello_world::greeter_client::GreeterClient;
 use hello_world::HelloRequest;
@@ -123,17 +123,33 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
   
     }); 
 
-    // tokio::spawn(async move {
-    //     // Process each socket concurrently.
-    //     let mut client = GreeterClient::connect("http://[::1]:50051").await.unwrap();
-    //     let request = tonic::Request::new(HelloRequest {
-    //     name: "10".to_string(),
-    //     });
-    //     let response = client.say_hello_again(request).await.unwrap();
-    //     println!("RESPONSE={:?}", response.into_inner().message);
-    // });
+    tokio::spawn(async move {
 
- 
+
+let dir_checksum = {
+
+    Exec::shell("find . -type f") | Exec::cmd("sort") | Exec::cmd("sha1sum")
+}.capture();
+
+println!("{}",dir_checksum);
+        // Process each socket concurrently.
+        let mut client = GreeterClient::connect("http://[::1]:50051").await.unwrap();
+        let request = tonic::Request::new(HelloRequest {
+        name: "10".to_string(),
+        });
+        let response = client.say_hello_again(request).await.unwrap();
+        println!("RESPONSE={:?}", response.into_inner().message);
+    });
+
+     tokio::spawn(async move {
+        // Process each socket concurrently.
+        let mut client = GreeterClient::connect("http://[::1]:50050").await.unwrap();
+        let request = tonic::Request::new(HelloRequest {
+        name: "10".to_string(),
+        });
+        let response = client.say_hello_again(request).await.unwrap();
+        println!("RESPONSE={:?}", response.into_inner().message);
+    });
 
 
     // let addr_clone = "10.67.1.41".to_string();

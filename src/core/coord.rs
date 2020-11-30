@@ -34,10 +34,17 @@ apps: neighbour::Neighbour ,app_dy_tx_p:  mpsc::Sender<String> )
                  Some("NEWHOST") => { 
                     dy_tx_p.send(parts.next().unwrap().to_string()).await;
                   },
-                  Some("LIST") => { 
+                  Some("CLOUDLETS") => { 
 
                       println!("Connected Cloudlets:");
                       nb.list();
+                    // println!("{:?}",nb.get(&("hi".to_string())).unwrap());
+                    // println!("LIST {:?}", nb.get(&(  parts.next().unwrap().to_string()   )).unwrap()   );
+                  },
+                  Some("APPS") => { 
+
+                      println!("Connected Cloudlets:");
+                      apps.list();
                     // println!("{:?}",nb.get(&("hi".to_string())).unwrap());
                     // println!("LIST {:?}", nb.get(&(  parts.next().unwrap().to_string()   )).unwrap()   );
                   },
