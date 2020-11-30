@@ -8,7 +8,7 @@ use tracing_subscriber;
 use tracing::info;
 
 
-use rustsys::datastore::{ets,neighbour};
+use rustsys::datastore::{ets,neighbour,app};
 use rustsys::connection::{app_rx,rx,app_dy_tx,dy_tx,exter_in,tx};
 use rustsys::core::{coord};
 // use dns_lookup::{lookup_host, lookup_addr};
@@ -17,7 +17,7 @@ use pnet::datalink;
 
 use tokio::sync::watch;
 
-use subprocess::Exec
+use std::process::Command;
 
 use hello_world::greeter_client::GreeterClient;
 use hello_world::HelloRequest;
@@ -62,11 +62,11 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
     println!("addr is: {}",addr);
     let (mut p1, mut c1) = mpsc::channel(32);
     let (mut p2, mut c2) = mpsc::channel(32);
-    let (mut p3, mut c3) = mpsc::channel(32);
+    // let (mut p3, mut c3) = mpsc::channel(32);
 
     let db = ets::SimpleEts::new();
     let nb = neighbour::Neighbour::new();
-    let apps = neighbour::Neighbour::new();
+    let apps = app::App::new();
     // nb.set("hi".to_string(), p2);
     // let p3 = nb.get(&("hi".to_string())).unwrap();
     // let p4=p3.clone();
@@ -107,7 +107,7 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
     let nb_clone = nb.clone();
     let apps_clone = apps.clone();
     let coord = tokio::spawn(async move { 
-        coord::run(&mut c1,db.clone(),nb_clone,p2,apps_clone,p3).await;
+        coord::run(addr,&mut c1,db.clone(),nb_clone,p2,apps_clone).await;
     });
 
 
@@ -117,39 +117,33 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
         dy_tx::run(nb_clone,&mut c2).await;
     });
 
-    let apps_clone = apps.clone();
-    let app_dy_tx = tokio::spawn(async move { 
-        app_dy_tx::run(apps_clone,&mut c3).await;
+    // let apps_clone = apps.clone();
+    // let app_dy_tx = tokio::spawn(async move { 
+    //     app_dy_tx::run(apps_clone,&mut c3).await;
   
-    }); 
+    // }); 
 
-    tokio::spawn(async move {
+    // tokio::spawn(async move {
 
 
-let dir_checksum = {
+    //     // Process each socket concurrently.
+    //     let mut client = GreeterClient::connect("http://localhost:50051").await.unwrap();
+    //     let request = tonic::Request::new(HelloRequest {
+    //     name: "10".to_string(),
+    //     });
+    //     let response = client.say_hello(request).await.unwrap();
+    //     println!("RESPONSE={:?}", response.into_inner().message);
+    // });
 
-    Exec::shell("find . -type f") | Exec::cmd("sort") | Exec::cmd("sha1sum")
-}.capture();
-
-println!("{}",dir_checksum);
-        // Process each socket concurrently.
-        let mut client = GreeterClient::connect("http://[::1]:50051").await.unwrap();
-        let request = tonic::Request::new(HelloRequest {
-        name: "10".to_string(),
-        });
-        let response = client.say_hello_again(request).await.unwrap();
-        println!("RESPONSE={:?}", response.into_inner().message);
-    });
-
-     tokio::spawn(async move {
-        // Process each socket concurrently.
-        let mut client = GreeterClient::connect("http://[::1]:50050").await.unwrap();
-        let request = tonic::Request::new(HelloRequest {
-        name: "10".to_string(),
-        });
-        let response = client.say_hello_again(request).await.unwrap();
-        println!("RESPONSE={:?}", response.into_inner().message);
-    });
+    //  tokio::spawn(async move {
+    //     // Process each socket concurrently.
+    //     let mut client = GreeterClient::connect("http://localhost:50050").await.unwrap();
+    //     let request = tonic::Request::new(HelloRequest {
+    //     name: "10".to_string(),
+    //     });
+    //     let response = client.say_hello(request).await.unwrap();
+    //     println!("RESPONSE={:?}", response.into_inner().message);
+    // });
 
 
     // let addr_clone = "10.67.1.41".to_string();

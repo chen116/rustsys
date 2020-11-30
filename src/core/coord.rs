@@ -1,24 +1,29 @@
 
 use tokio::sync::{mpsc, Mutex};
-use crate::datastore::{ets,neighbour};
+use crate::datastore::{ets,neighbour,app};
 
 
 use std::error::Error;
 use tokio::sync::watch;
 use std::process::Command;
-async fn create_new_app(port_num: String) -> String {
-   let output =  Command::new("sh")
-            .arg("-c")
-            .arg("echo hello")
-            .output()
-            .expect("failed to execute process");
-    "the result of the computation".to_string()
+
+
+
+async fn create_new_app(app_name: String) -> String {
+let exec = format!("/home/vic/cpp_grpc/grpc/examples/cpp/helloworld/cmake/build/server_{}",app_name);
+
+let mut _child = Command::new(exec)
+                        .arg("")
+                        .spawn()
+                        .expect("failed to execute child");
+let res = format!("{} deployed",app_name);
+res
 }
 
 
-pub async fn run(c1: &mut mpsc::Receiver<String>, db: ets::SimpleEts, 
+pub async fn run(myaddr: String,c1: &mut mpsc::Receiver<String>, db: ets::SimpleEts, 
 nb: neighbour::Neighbour, dy_tx_p: mpsc::Sender<String> , 
-apps: neighbour::Neighbour ,app_dy_tx_p:  mpsc::Sender<String> ) 
+apps: app::App  ) 
 -> Result<(), Box<dyn Error>>  {
 
 
@@ -54,19 +59,17 @@ apps: neighbour::Neighbour ,app_dy_tx_p:  mpsc::Sender<String> )
                     tx_p.send(part2s.next().unwrap().to_string()).await;
                   },
                  Some("NEWAPP") => { 
-                    let port_num = parts.next().unwrap().to_string();
-                    let port_num_clone = port_num.clone();
+                    let app_name = parts.next().unwrap().to_string();
+                    let app_name_clone = app_name.clone();
                     let join_handle = tokio::spawn(async move {
-                        create_new_app(port_num_clone).await
+                        create_new_app(app_name_clone).await
                     });
                     let res = join_handle.await.unwrap();
+                    println!("{}",res );
   
-                    app_dy_tx_p.send(port_num).await;
                   },
                  Some("SEND2APP") => { 
-                    let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
-                    let tx_p = apps.get(&(  part2s.next().unwrap().to_string()   )).unwrap() ;
-                    tx_p.send(part2s.next().unwrap().to_string()).await;
+
                   },
                  _ => {               
                         let db = db.clone();
