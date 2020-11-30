@@ -95,15 +95,15 @@ apps: app::App  )
 
                     if host == myaddr {
                       println!("run here");
-                      if appname == "pi" {
+                      if appname == "pi".to_string() {
                             tokio::spawn(async move {
                             // Process each socket concurrently.
                             let mut client = GreeterClient::connect("http://localhost:50050").await.unwrap();
                             let request = tonic::Request::new(HelloRequest {
-                            name: value,
+                            name: value.clone(),
                             });
                             let response = client.say_hello(request).await.unwrap();
-                            println!("RESPONSE={:?}", response.into_inner().message);
+                            println!("RESPONSE {}({})={:?}", appname,value,response.into_inner().message);
                         });
                       }
                       else
@@ -112,10 +112,10 @@ apps: app::App  )
                             // Process each socket concurrently.
                             let mut client = GreeterClient::connect("http://localhost:50051").await.unwrap();
                             let request = tonic::Request::new(HelloRequest {
-                            name: value,
+                            name: value.clone(),
                             });
                             let response = client.say_hello(request).await.unwrap();
-                            println!("RESPONSE={:?}", response.into_inner().message);
+                            println!("RESPONSE {}({})={:?}", appname,value,response.into_inner().message);
                         });
 
 
