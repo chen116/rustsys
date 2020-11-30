@@ -88,7 +88,7 @@ apps: app::App  )
                     let host = apps.get(&(appname) ).unwrap() ;
 
                     if host == myaddr {
-                      println!("run here")
+                      println!("run here");
                     }else{
                     let tx_p = nb.get(&(host)).unwrap() ;
                     tx_p.send(part2s.next().unwrap().to_string()).await;
