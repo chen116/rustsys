@@ -90,6 +90,14 @@ apps: app::App  )
 
                     let appname =  part2s.next().unwrap().to_string() ;
                     let value =  part2s.next().unwrap().to_string() ;
+
+
+                    let originHost = part2s.next() ;
+                    match originHost {
+                      Some(inner) => println!("oroginal HOST {}",inner.to_string()),
+                      None => println!("no host"),
+                    }
+
                     //  println!("{} {}",parts.next().unwrap().to_string(),parts.next().unwrap().to_string());
                     let host = apps.get(&(appname) ).unwrap() ;
 
@@ -104,7 +112,7 @@ apps: app::App  )
                             });
                             let response = client.say_hello(request).await.unwrap();
                             println!("RESPONSE {}({})={:?}", appname,value,response.into_inner().message);
-                           
+                          
                         });
                       }
                       else
