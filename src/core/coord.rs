@@ -75,8 +75,8 @@ apps: app::App  )
   
                   },
                  Some("UPDATEAPPS") => { 
-                   println!("{} {}",parts.next().unwrap().to_string(),parts.next().unwrap().to_string());
-                  //  apps.set(parts.next().unwrap().to_string(),parts.next().unwrap().to_string()   );
+                  //  println!("{} {}",parts.next().unwrap().to_string(),parts.next().unwrap().to_string());
+                   apps.set(parts.next().to_string(),parts.next().to_string()   );
 
                   },
                  _ => {               
