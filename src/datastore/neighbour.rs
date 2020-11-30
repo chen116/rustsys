@@ -38,11 +38,11 @@ impl Neighbour {
         }
     }
 
-    pub fn broadcast(&self, appname: String, host: String){
+    async pub  fn broadcast(&self, appname: String, host: String){
         let state = self.shared.lock().unwrap();
         for (key, value) in state.iter() {
             let info = format!("UPDATEAPPS {} {}",appname,host);
-            value.send(info.to_string());
+            value.send(info.to_string()).await;
         }
     }
   

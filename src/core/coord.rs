@@ -71,6 +71,7 @@ apps: app::App  )
   
                   },
                  Some("UPDATEAPPS") => { 
+                   println!("getting stuff");
                    apps.set(parts.next().unwrap().to_string(),parts.next().unwrap().to_string()   );
 
                   },
