@@ -122,10 +122,23 @@ apps: app::App  )
                             let request = tonic::Request::new(HelloRequest {
                             name: value.clone(),
                             });
-                            let response = client.say_hello(request).await.unwrap();
-                            println!("RESPONSE {}({})={:?}", appname,value,response.into_inner().message);
-                          
+                                   let response = client.say_hello(request).await.unwrap();
+                            // println!("RESPONSE {}({})={:?}", appname,value,response.into_inner().message);
+                            let resStr = response.into_inner().message.to_string();
+                            // println!("RESPONSE {}({})={}", appname,value,resStr);
 
+                            let info = format!("RESPONSE {}({})={}",appname,value,resStr);
+                            
+                            if remoteCaller != "none".to_string()
+                            {
+                               
+                              let tx_p = nb_clone.get(&( remoteCaller   )).unwrap() ;
+                              tx_p.send(   info.to_string()).await;
+                            }
+                            else{
+                              println!("{}",info );
+                            }
+                       
                         });
                       }
                       else
