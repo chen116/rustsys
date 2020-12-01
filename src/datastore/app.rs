@@ -33,9 +33,13 @@ impl App {
     pub fn list(&self)
     {
         let state = self.shared.lock().unwrap();
-        for (key, value) in state.iter() {
-        println!("{:?} / {:?}", key, value);
-    }
+        if state.len()==0 {
+            println!("no known apps");
+        }else{
+            for (key, value) in state.iter() {
+            println!("{:?} / {:?}", key, value);
+            }
+        }
 }
   
 }
