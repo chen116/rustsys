@@ -90,6 +90,21 @@ apps: app::App  )
 
                     let appname =  part2s.next().unwrap().to_string() ;
                     let value =  part2s.next().unwrap().to_string() ;
+                    let mut remoteCaller = "none".to_string();
+                          let originHost = part2s.next() ;
+                          match originHost {
+                            Some(inner) =>
+                            {
+                             
+                              remoteCaller = inner.to_string().clone();
+                            }
+                             ,
+                            None => {
+                              println!("from here");
+                              
+                            },
+                          }
+                              println!("from HOST {}",remoteCaller);
 
 
 
@@ -121,16 +136,12 @@ apps: app::App  )
                             });
                             let response = client.say_hello(request).await.unwrap();
                             println!("RESPONSE {}({})={:?}", appname,value,response.into_inner().message);
-                          let originHost = part2s.next() ;
-                          match originHost {
-                            Some(inner) =>
-                            {
-                             println!("from HOST {}",inner.to_string())
-                             
-                            }
-                             ,
-                            None => println!("from here"),
-                          }
+                            // if remoteCaller != "none".to_string()
+                            // {
+                            //    let info = format!("RES {}({})={}",appname,value,myaddr.clone());
+                            // let tx_p = nb.get(&( remoteCaller   )).unwrap() ;
+                            // tx_p.send(   info.to_string()).await;
+                            // }
                        
                         });
 
@@ -149,6 +160,13 @@ apps: app::App  )
 
 
                   },
+                   Some("RES") => { 
+
+                     println!("resss");
+                   
+                   
+                   }
+
                  _ => {               
                         let db = db.clone();
                         // Like with other small servers, we'll `spawn` this client to ensure it
