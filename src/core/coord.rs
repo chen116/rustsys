@@ -86,7 +86,7 @@ apps: app::App  )
 
                   },
                   Some("SEND2APP") => { 
-                    let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
+                    let mut part2s =  (parts.next().unwrap()).splitn(3, ' ');
 
                     let appname =  part2s.next().unwrap().to_string() ;
                     let value =  part2s.next().unwrap().to_string() ;
@@ -104,7 +104,7 @@ apps: app::App  )
                               
                             },
                           }
-                              println!("from HOST {}",remoteCaller);
+                   println!("from HOST {}",remoteCaller);
 
 
 
