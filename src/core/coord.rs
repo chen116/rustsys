@@ -137,14 +137,20 @@ apps: app::App  )
                             name: value.clone(),
                             });
                             let response = client.say_hello(request).await.unwrap();
-                            println!("RESPONSE {}({})={:?}", appname,value,response.into_inner().message);
-                            
+                            // println!("RESPONSE {}({})={:?}", appname,value,response.into_inner().message);
+                            let resStr = response.into_inner().message.to_string();
+                            // println!("RESPONSE {}({})={}", appname,value,resStr);
+
+                            let info = format!("RESPONSE {}({})={}",appname,value,resStr);
                             
                             if remoteCaller != "none".to_string()
                             {
-                               let info = format!("RES {}({})={}",appname,value,myaddr_clone.clone());
+                               
                               let tx_p = nb_clone.get(&( remoteCaller   )).unwrap() ;
                               tx_p.send(   info.to_string()).await;
+                            }
+                            else{
+                              println!("{}",info );
                             }
                        
                         });
@@ -164,9 +170,9 @@ apps: app::App  )
 
 
                   },
-                   Some("RES") => { 
+                   Some("RESPONSE") => { 
 
-                     println!("{}",parts.next().unwrap());
+                     println!("RESPONSE {}",parts.next().unwrap());
                    
                    
                    }
