@@ -110,6 +110,8 @@ apps: app::App  )
 
                     //  println!("{} {}",parts.next().unwrap().to_string(),parts.next().unwrap().to_string());
                     let host = apps.get(&(appname) ).unwrap() ;
+                    let nb_clone = nb.clone();
+                    let myaddr_clone = myaddr.clone();
 
                     if host == myaddr {
                       println!("run here");
@@ -136,12 +138,14 @@ apps: app::App  )
                             });
                             let response = client.say_hello(request).await.unwrap();
                             println!("RESPONSE {}({})={:?}", appname,value,response.into_inner().message);
-                            // if remoteCaller != "none".to_string()
-                            // {
-                            //    let info = format!("RES {}({})={}",appname,value,myaddr.clone());
-                            // let tx_p = nb.get(&( remoteCaller   )).unwrap() ;
-                            // tx_p.send(   info.to_string()).await;
-                            // }
+                            
+                            
+                            if remoteCaller != "none".to_string()
+                            {
+                               let info = format!("RES {}({})={}",appname,value,myaddr_clone.clone());
+                              let tx_p = nb_clone.get(&( remoteCaller   )).unwrap() ;
+                              tx_p.send(   info.to_string()).await;
+                            }
                        
                         });
 
@@ -162,7 +166,7 @@ apps: app::App  )
                   },
                    Some("RES") => { 
 
-                     println!("resss");
+                     println!("{}",parts.next().unwrap());
                    
                    
                    }
