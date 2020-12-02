@@ -19,16 +19,15 @@ use tokio::sync::watch;
 
 use std::process::Command;
 
-use hello_world::greeter_client::GreeterClient;
-use hello_world::HelloRequest;
-
-pub mod hello_world {
-    tonic::include_proto!("helloworld");
-}
-
+// Import the wasmer runtime so we can use it
 
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn Error>>  {
+
+    
+    // print!("{}", String::from_utf8_lossy(wasm_bytes));
+
+
 
     // println!("{:?}", network().unwrap().ip); // 192.168.43.134
     // println!("{:?}", local().unwrap()); // 127.0.0.1
