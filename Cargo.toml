@@ -87,8 +87,8 @@ wasmer-compiler-cranelift = "1.0.0-alpha01.0"
 # The engine we'll use in the API
 wasmer-engine-jit = "1.0.0-alpha01.0"
 
-wasmer-wasi = "1.0.0-beta"
-wasmer-runtime = "0.17.1"
+#wasmer-wasi = "1.0.0-beta"
+#wasmer-runtime = "0.17.1"
 
 
 #wasmtime-rust = { git = 'https://github.com/cranestation/wasmtime',branch='main' }
