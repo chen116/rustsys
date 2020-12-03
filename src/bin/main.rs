@@ -19,13 +19,8 @@ use tokio::sync::watch;
 
 use std::process::Command;
 
-// Import the wasmer runtime so we can use it
-
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn Error>>  {
-
-    
-    // print!("{}", String::from_utf8_lossy(wasm_bytes));
 
 
 

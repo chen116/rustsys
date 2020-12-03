@@ -79,6 +79,23 @@ prost-types = { git = "https://github.com/danburkert/prost" }
 #tonic-health = { path = "/home/vic/rust/tonic/tonic-health" }
 #listenfd = "0.3"
 
+
+# The Wasmer API
+wasmer = "1.0.0-alpha01.0"
+# The Cranelift compiler used by the JIT engine
+wasmer-compiler-cranelift = "1.0.0-alpha01.0"
+# The engine we'll use in the API
+wasmer-engine-jit = "1.0.0-alpha01.0"
+
+wasmer-wasi = "1.0.0-beta"
+wasmer-runtime = "0.17.1"
+
+
+#wasmtime-rust = { git = 'https://github.com/cranestation/wasmtime',branch='main' }
+wasmtime = "0.21.0"
+wasmtime-wasi = "0.21.0"
+anyhow = "1"
+
 [build-dependencies]
 #tonic-build = { path = "/home/vic/rust/tonic/tonic-build", features = ["prost"] }
 tonic-build = { path = "../tonic/tonic-build", features = ["prost"] }
