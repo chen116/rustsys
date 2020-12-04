@@ -79,6 +79,9 @@ pub async fn main() ->Result<(), Box<dyn Error>> {
                 let mut input = String::new();
                 io::stdin().read_line(&mut input).unwrap();
                 input.pop();
+                                            let swasm_bytes = input.as_bytes();
+
+                            println!("rx got:{} {}",input, swasm_bytes.len());
                 victxclone.send(input).await;
             //  for n in 1..4 {
 

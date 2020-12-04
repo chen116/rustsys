@@ -71,7 +71,7 @@ pub async fn run(addr_clone: String,p1: mpsc::Sender<String>) -> Result<(), Box<
                 while let Some(msg) = lines.next().await {
                     match msg {
                         Ok(txt) => {
-                            let swasm_bytes = wasm_string.as_bytes();
+                            let swasm_bytes = txt.as_bytes();
 
                             println!("rx got:{} {}",txt, swasm_bytes.len());
 
