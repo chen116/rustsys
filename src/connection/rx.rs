@@ -66,7 +66,7 @@ pub async fn run(addr_clone: String,p1: mpsc::Sender<String>) -> Result<(), Box<
         let p1clone = p1.clone();
             tokio::spawn(async move {
                 // let mut lines = Framed::new(stream, LinesCodec::new());
-                let mut lines = Framed::with_capacity(stream, LinesCodec::new(), 4096);
+                let mut lines = Framed::with_capacity(stream, LinesCodec::new(), 8192);
                 while let Some(msg) = lines.next().await {
                     match msg {
                         Ok(txt) => {
