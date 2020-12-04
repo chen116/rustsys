@@ -73,17 +73,17 @@ apps: app::App  )
                 let wasm_string = part2s.next().unwrap().to_string();
  let swasm_bytes = wasm_string.as_bytes();
 
-    let store = Store::default();
-    let module = Module::from_binary(store.engine(), swasm_bytes)?;
-    let instance = Instance::new(&store, &module, &[])?;
+    // let store = Store::default();
+    // let module = Module::from_binary(store.engine(), swasm_bytes)?;
+    // let instance = Instance::new(&store, &module, &[])?;
 
-    // Invoke `gcd` export
-    let func = instance
-        .get_func("fib")
-        .ok_or(anyhow::format_err!("failed to find `gcd` function export"))?
-        .get1::<i32, i32>()?;
+    // // Invoke `gcd` export
+    // let func = instance
+    //     .get_func("fib")
+    //     .ok_or(anyhow::format_err!("failed to find `gcd` function export"))?
+    //     .get1::<i32, i32>()?;
 
-    println!("fib({}) = {}", param, func( param.parse::<i32>().unwrap())?);
+    // println!("fib({}) = {}", param, func( param.parse::<i32>().unwrap())?);
 
                },
 
