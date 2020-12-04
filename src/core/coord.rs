@@ -68,7 +68,7 @@ apps: app::App  )
                },
                Some("GETWASM") =>{
                  //param wasm_string
-                let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
+                let mut part2s =  (parts.next().unwrap()).splitn(3, ' ');
                 let param = parts.next().unwrap().to_string();
                 let wasm_string = parts.next().unwrap().to_string();
  let swasm_bytes = wasm_string.as_bytes();
