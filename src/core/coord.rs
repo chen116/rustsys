@@ -7,8 +7,16 @@ use std::error::Error;
 use tokio::sync::watch;
 use std::process::Command;
 
+
+use anyhow::Result;
+use wasmtime::*;
+
+
 use hello_world::greeter_client::GreeterClient;
 use hello_world::HelloRequest;
+
+
+
 pub mod hello_world {
     tonic::include_proto!("helloworld");
 }
@@ -27,8 +35,7 @@ res
 
 
 
-use anyhow::Result;
-use wasmtime::*;
+
 
 pub async fn run(myaddr: String,c1: &mut mpsc::Receiver<String>, db: ets::SimpleEts, 
 nb: neighbour::Neighbour, dy_tx_p: mpsc::Sender<String> , 
@@ -68,23 +75,36 @@ apps: app::App  )
                },
                Some("GETWASM") =>{
                  //param wasm_string
-                let mut part2s =  (parts.next().unwrap()).splitn(3, ' ');
+                let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
                 let param = part2s.next().unwrap().to_string();
                 let wasm_string = part2s.next().unwrap().to_string();
- let swasm_bytes = wasm_string.as_bytes();
- println!("{}", param);
+ let swasm_bytes =  wasm_string.as_bytes();
 
-    // let store = Store::default();
-    // let module = Module::from_binary(store.engine(), swasm_bytes)?;
-    // let instance = Instance::new(&store, &module, &[])?;
 
-    // // Invoke `gcd` export
-    // let func = instance
-    //     .get_func("fib")
-    //     .ok_or(anyhow::format_err!("failed to find `gcd` function export"))?
-    //     .get1::<i32, i32>()?;
 
-    // println!("fib({}) = {}", param, func( param.parse::<i32>().unwrap())?);
+let wasm_bytess = include_bytes!("../wasm/fib.wasm");
+    let s = match String::from_utf8(wasm_bytess.to_vec()) {
+        Ok(v) => v,
+        Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+    };
+    let swasm_bytess = s.as_bytes();
+
+
+ println!("{}",wasm_string.len());
+ println!("kkkk");
+ println!("{}",s.len());
+
+    let store = Store::default();
+    let module = Module::from_binary(store.engine(), swasm_bytes)?;
+    let instance = Instance::new(&store, &module, &[])?;
+
+    // Invoke `gcd` export
+    let func = instance
+        .get_func("fib")
+        .ok_or(anyhow::format_err!("failed to find `gcd` function export"))?
+        .get1::<i32, i32>()?;
+
+    println!("fib({}) = {}", param, func( param.parse::<i32>().unwrap())?);
 
                },
 

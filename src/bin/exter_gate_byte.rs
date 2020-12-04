@@ -80,9 +80,48 @@ pub async fn main() ->Result<(), Box<dyn Error>> {
                 input.pop();
                 
                 
+                 let wasm_bytes = include_bytes!("../wasm/fib.wasm");
+                 let wasmvs = wasm_bytes.to_vec();
+                  let wasm_string = String::from_utf8_lossy(&(wasmvs)) ;
+                //   let wasm_string = match String::from_utf8(wasm_bytes.to_vec()) {
+                //       Ok(v) => v,
+                //       Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+                //   };
+
+                  input.insert_str(0,&wasm_string);
+                
+                
+                
+                
+                
+                
+                
+                
+                let string_byte_len = wasm_string.as_bytes().len().to_string();
+                let string_byte_len_len = wasm_string.as_bytes().len().to_string().as_bytes().len();
+                let prefix_len: u32 = 4;
+                let mut complement_placeholder = 4-string_byte_len_len;
+                // let s="0021".to_string();
+                // let intt=s.parse::<i32>().unwrap();
+
+                input.insert_str(0,&(string_byte_len));
+
+                let final_string = loop {
+                    complement_placeholder -=1;
+                    input.insert(0,'0');
+                    if complement_placeholder==0{
+                        break input;
+                    }
+                };
 
 
-                victxclone.send(input).await;
+
+
+
+
+                            println!("gate got:{} {} {} {}",final_string,
+                             string_byte_len, string_byte_len_len,final_string.len());
+                victxclone.send(final_string).await;
             //  for n in 1..4 {
 
             //     victxclone.send(n.to_string()).await;
