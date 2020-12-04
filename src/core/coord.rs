@@ -48,8 +48,8 @@ apps: app::App  )
                Some("SENDWASM") => {
                  //host param
                   let mut part2s =  (parts.next().unwrap()).splitn(3, ' ');
-                  let host = parts.next().unwrap().to_string();
-                  let param = parts.next().unwrap().to_string();
+                  let host = part2s.next().unwrap().to_string();
+                  let param = part2s.next().unwrap().to_string();
                   let wasm_bytes = include_bytes!("../wasm/fib.wasm");
                   let wasm_string = match String::from_utf8(wasm_bytes.to_vec()) {
                       Ok(v) => v,
@@ -69,8 +69,8 @@ apps: app::App  )
                Some("GETWASM") =>{
                  //param wasm_string
                 let mut part2s =  (parts.next().unwrap()).splitn(3, ' ');
-                let param = parts.next().unwrap().to_string();
-                let wasm_string = parts.next().unwrap().to_string();
+                let param = part2s.next().unwrap().to_string();
+                let wasm_string = part2s.next().unwrap().to_string();
  let swasm_bytes = wasm_string.as_bytes();
 
     let store = Store::default();
