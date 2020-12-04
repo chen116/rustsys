@@ -95,12 +95,12 @@ pub async fn main() ->Result<(), Box<dyn Error>> {
                 
                 
                 
-                let string_byte_len = input.as_bytes().len().to_string();
-                let string_byte_len_len = input.as_bytes().len().to_string().as_bytes().len();
-                let prefix_len = 4;
+                let string_byte_len = wasm_string.as_bytes().len().to_string();
+                let string_byte_len_len = wasm_string.as_bytes().len().to_string().as_bytes().len();
+                let prefix_len: u32 = 4;
                 let mut complement_placeholder = 4-string_byte_len_len;
-                let s="0021".to_string();
-                let intt=s.parse::<i32>().unwrap();
+                // let s="0021".to_string();
+                // let intt=s.parse::<i32>().unwrap();
 
                 input.insert_str(0,&(string_byte_len));
 
@@ -116,8 +116,8 @@ pub async fn main() ->Result<(), Box<dyn Error>> {
 
 
 
-                            println!("gate got:{} {} {} {}",final_string,
-                             string_byte_len, string_byte_len_len,intt);
+                            println!("gate got:{} {} {}",final_string,
+                             string_byte_len, string_byte_len_len);
                 victxclone.send(final_string).await;
             //  for n in 1..4 {
 

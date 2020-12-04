@@ -45,24 +45,30 @@ pub async fn run(addr_clone: String, p1: mpsc::Sender<String>) -> Result<(), Box
                         Ok(txt) => {
                             let mut cloned_txt = txt.clone();
                             if newdata_len == 0 {
+                                println!("data init whole len:{}", cloned_txt.len());
+
                                 let data = cloned_txt.split_off(4);
+                                // let data_size = data.clone();
+                                newdata_len =cloned_txt.parse::<u32>().unwrap()  ;
+
                                 content.push_str(&data);
-                                println!("{} plsited {}",data, cloned_txt);
-                                let data_size = data.clone();
-                                newdata_len =data_size.parse::<u32>().unwrap()  ;
                                 println!("{} len : {}",
                                 data,newdata_len);
+                                println!("data init real len:{},{}",content.len(), data.len());
 
                             } else {
-
+                                println!("data filling len : {},{}",content.len(),txt.len());
                                 content.push_str(&txt);
 
                             }
                                 println!("content len {}",content.len());
 
                             // println!("exter in got:{}",content);
-                            if (content.len() as u32) == newdata_len {
-                                println!("newdata_len {}, content {}",newdata_len,content);
+                            if (content.len() as u32) >= newdata_len {
+                                let param = content.split_off( (newdata_len as usize)-1);
+                                
+
+                                println!("newdata_len {}, param {}",newdata_len,param);
 
                                 p1clone.send(content.clone()).await.unwrap();
                                 content.clear();
