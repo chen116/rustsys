@@ -86,17 +86,17 @@ pub async fn main() ->Result<(), Box<dyn Error>> {
                 let s="0021".to_string();
                 let intt=s.parse::<i32>().unwrap();
 
-                let final_string = loop {
-                    complement_placeholder -=1;
-                    input.insert(0,'0');
-                    if complement_placeholder==0{
-                        break input;
-                    }
-                }
+                // let final_string = loop {
+                //     complement_placeholder -=1;
+                //     input.insert(0,'0');
+                //     if complement_placeholder==0{
+                //         break input;
+                //     }
+                // }
 
 
                             println!("gate got:{} {} {} {}",input,
-                             final_string, string_byte_len_len,intt);
+                             string_byte_len, string_byte_len_len,intt);
                 victxclone.send(input).await;
             //  for n in 1..4 {
 
