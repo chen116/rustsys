@@ -16,7 +16,6 @@ use tokio::sync::mpsc;
 use structopt::StructOpt;
 use rustsys::{EXTER_IN_PORT};
 
-
 #[derive(StructOpt, Debug)]
 #[structopt(name = "fogsys-server", version = env!("CARGO_PKG_VERSION"), author = env!("CARGO_PKG_AUTHORS"), about = "A Redis server")]
 struct Remote_host {
@@ -79,6 +78,23 @@ pub async fn main() ->Result<(), Box<dyn Error>> {
                 let mut input = String::new();
                 io::stdin().read_line(&mut input).unwrap();
                 input.pop();
+                
+                
+                 let wasm_bytes = include_bytes!("../wasm/fib.wasm");
+                  let wasm_string = match String::from_utf8(wasm_bytes.to_vec()) {
+                      Ok(v) => v,
+                      Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+                  };
+
+                  input.insert_str(0,&wasm_string);
+                
+                
+                
+                
+                
+                
+                
+                
                 let string_byte_len = input.as_bytes().len().to_string();
                 let string_byte_len_len = input.as_bytes().len().to_string().as_bytes().len();
                 let prefix_len = 4;
@@ -86,18 +102,23 @@ pub async fn main() ->Result<(), Box<dyn Error>> {
                 let s="0021".to_string();
                 let intt=s.parse::<i32>().unwrap();
 
-                // let final_string = loop {
-                //     complement_placeholder -=1;
-                //     input.insert(0,'0');
-                //     if complement_placeholder==0{
-                //         break input;
-                //     }
-                // }
+                input.insert_str(0,&(string_byte_len));
+
+                let final_string = loop {
+                    complement_placeholder -=1;
+                    input.insert(0,'0');
+                    if complement_placeholder==0{
+                        break input;
+                    }
+                };
 
 
-                            println!("gate got:{} {} {} {}",input,
+
+
+
+                            println!("gate got:{} {} {} {}",final_string,
                              string_byte_len, string_byte_len_len,intt);
-                victxclone.send(input).await;
+                victxclone.send(final_string).await;
             //  for n in 1..4 {
 
             //     victxclone.send(n.to_string()).await;

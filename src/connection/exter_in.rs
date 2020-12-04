@@ -36,11 +36,39 @@ pub async fn run(addr_clone: String, p1: mpsc::Sender<String>) -> Result<(), Box
         let p1clone = p1.clone();
             tokio::spawn(async move {
                 let mut lines = Framed::new(stream, LinesCodec::new());
+                let mut lenbuff = String::new();
+                let mut content = String::new();
+                let mut newdata_len: u32 = 0;
+                
                 while let Some(msg) = lines.next().await {
                     match msg {
                         Ok(txt) => {
-                            println!("exter in got:{}",txt);
-                            p1clone.send(txt).await.unwrap();
+                            let mut cloned_txt = txt.clone();
+                            if newdata_len == 0 {
+                                let data = cloned_txt.split_off(4);
+                                content.push_str(&data);
+                                println!("{} plsited {}",data, cloned_txt);
+                                let data_size = data.clone();
+                                newdata_len =data_size.parse::<u32>().unwrap()  ;
+                                println!("{} len : {}",
+                                data,newdata_len);
+
+                            } else {
+
+                                content.push_str(&txt);
+
+                            }
+                                println!("content len {}",content.len());
+
+                            // println!("exter in got:{}",content);
+                            if (content.len() as u32) == newdata_len {
+                                println!("newdata_len {}, content {}",newdata_len,content);
+
+                                p1clone.send(content.clone()).await.unwrap();
+                                content.clear();
+                                newdata_len=0;
+                            }
+                            // p1clone.send(content.clone()).await.unwrap();
                         },
                         _ => println!("exter in get nuffin"),
                     }
