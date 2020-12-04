@@ -47,7 +47,7 @@ apps: app::App  )
              match parts.next() {
                Some("SENDWASM") => {
                  //host param
-                  let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
+                  let mut part2s =  (parts.next().unwrap()).splitn(3, ' ');
                   let host = parts.next().unwrap().to_string();
                   let param = parts.next().unwrap().to_string();
                   let wasm_bytes = include_bytes!("../wasm/fib.wasm");
