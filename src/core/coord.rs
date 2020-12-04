@@ -72,6 +72,7 @@ apps: app::App  )
                 let param = part2s.next().unwrap().to_string();
                 let wasm_string = part2s.next().unwrap().to_string();
  let swasm_bytes = wasm_string.as_bytes();
+ println!("{}", param);
 
     // let store = Store::default();
     // let module = Module::from_binary(store.engine(), swasm_bytes)?;
@@ -251,7 +252,7 @@ apps: app::App  )
                         // based on the values in the database.
                         let response = db.handle_request(&mesg.as_str());
                         let response = response.serialize();
-                        println!("response: {}",response);
+                        println!("response others: {}",response);
 
                     // The connection will be closed at this point as `lines.next()` has returned `None`.
                     });}
