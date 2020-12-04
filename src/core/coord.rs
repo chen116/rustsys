@@ -26,6 +26,10 @@ res
 }
 
 
+
+use anyhow::Result;
+use wasmtime::*;
+
 pub async fn run(myaddr: String,c1: &mut mpsc::Receiver<String>, db: ets::SimpleEts, 
 nb: neighbour::Neighbour, dy_tx_p: mpsc::Sender<String> , 
 apps: app::App  ) 
@@ -41,6 +45,49 @@ apps: app::App  )
              let mut parts = mesg.splitn(2, ' ');
 
              match parts.next() {
+               Some("SENDWASM") => {
+                 //host param
+                  let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
+                  let host = parts.next().unwrap().to_string();
+                  let param = parts.next().unwrap().to_string();
+                  let wasm_bytes = include_bytes!("../wasm/fib.wasm");
+                  let wasm_string = match String::from_utf8(wasm_bytes.to_vec()) {
+                      Ok(v) => v,
+                      Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+                  };
+
+                   let tx_p = nb.get(&(host   )).unwrap() ;
+
+                          let info = format!("GETWASM {} {}",param,wasm_string);
+                            
+
+                              tx_p.send(   info.to_string()).await;
+                            
+
+
+               },
+               Some("GETWASM") =>{
+                 //param wasm_string
+                let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
+                let param = parts.next().unwrap().to_string();
+                let wasm_string = parts.next().unwrap().to_string();
+ let swasm_bytes = wasm_string.as_bytes();
+
+    let store = Store::default();
+    let module = Module::from_binary(store.engine(), swasm_bytes)?;
+    let instance = Instance::new(&store, &module, &[])?;
+
+    // Invoke `gcd` export
+    let func = instance
+        .get_func("fib")
+        .ok_or(anyhow::format_err!("failed to find `gcd` function export"))?
+        .get1::<i32, i32>()?;
+
+    println!("fib({}) = {}", param, func( param.parse::<i32>().unwrap())?);
+
+               },
+
+
                  Some("NEWHOST") => { 
                     dy_tx_p.send(parts.next().unwrap().to_string()).await;
                   },

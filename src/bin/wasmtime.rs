@@ -4,19 +4,24 @@ use wasmtime::*;
 // use wasmtime_wasi::{Wasi, WasiCtx};
 
 fn main() -> Result<()> {
-let wasm_bytes = include_bytes!("../wasm/add.wasm");
+let wasm_bytes = include_bytes!("../wasm/fib.wasm");
+    let s = match String::from_utf8(wasm_bytes.to_vec()) {
+        Ok(v) => v,
+        Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+    };
+    let swasm_bytes = s.as_bytes();
 
     let store = Store::default();
-    let module = Module::from_binary(store.engine(), wasm_bytes)?;
+    let module = Module::from_binary(store.engine(), swasm_bytes)?;
     let instance = Instance::new(&store, &module, &[])?;
 
     // Invoke `gcd` export
-    let gcd = instance
-        .get_func("add")
+    let func = instance
+        .get_func("fib")
         .ok_or(anyhow::format_err!("failed to find `gcd` function export"))?
-        .get2::<i32, i32, i32>()?;
+        .get1::<i32, i32>()?;
 
-    println!("gcd(6, 27) = {}", gcd(6, 27)?);
+    println!("gcd(6, 27) = {}", func(6)?);
 
 // let wasm_bytes = include_bytes!("../wasm/hi.wasm");
 

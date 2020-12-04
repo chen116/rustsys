@@ -4,7 +4,6 @@ use wasmer_compiler_cranelift::Cranelift;
 use wasmer_engine_jit::JIT;
 
 
-
 // use wasmer::{Store, Module, Instance};
 // use wasmer_runtime::{error, imports, instantiate, Func};
 // use wasmer_wasi::{generate_import_object_from_env, get_wasi_version};
@@ -14,10 +13,14 @@ use wasmer_engine_jit::JIT;
 
     // Now let's get the .wasm file as bytes
     let wasm_bytes = include_bytes!("../wasm/fib.wasm");
-
+    let s = match String::from_utf8(wasm_bytes.to_vec()) {
+        Ok(v) => v,
+        Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+    };
+    let swasm_bytes = s.as_bytes();
     // With the Store and the wasm bytes we can create a wasm Module which is
     // a non-runnable representation of the contents of the wasm file.
-    let module = Module::new(&store, &wasm_bytes[..]).expect("create module");
+    let module = Module::new(&store, &swasm_bytes[..]).expect("create module");
 
     // We create an empty ImportObject for the next step because we don't need to
     // import anything into `add.wasm`.

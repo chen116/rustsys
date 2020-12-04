@@ -1,3 +1,4 @@
+// cargo run --bin exter_gate -- --host 10.67.1.239
 use tokio::net::{ TcpStream};
 use tokio::stream::{StreamExt};
 use tokio_util::codec::{Framed, LinesCodec};
