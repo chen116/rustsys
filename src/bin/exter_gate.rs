@@ -78,7 +78,7 @@ pub async fn main() ->Result<(), Box<dyn Error>> {
             loop {
                 let mut input = String::new();
                 io::stdin().read_line(&mut input).unwrap();
-                input.pop();
+                // input.pop();
                                             let swasm_bytes = input.as_bytes();
 
                             println!("rx got:{} {}",input, swasm_bytes.len());
