@@ -67,10 +67,14 @@ pub async fn run(addr_clone: String,p1: mpsc::Sender<String>) -> Result<(), Box<
             tokio::spawn(async move {
                 // let mut lines = Framed::new(stream, LinesCodec::new());
                 let mut lines = Framed::with_capacity(stream, LinesCodec::new(), 8192);
+                let mut frame =  String::new();
                 while let Some(msg) = lines.next().await {
                     match msg {
                         Ok(txt) => {
-                            println!("rx got:{}",txt);
+                            let swasm_bytes = wasm_string.as_bytes();
+
+                            println!("rx got:{} {}",txt, swasm_bytes.len());
+
                             p1clone.send(txt).await.unwrap();
                         },
                         _ => println!("rx get nuffin"),
