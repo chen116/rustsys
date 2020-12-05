@@ -2,7 +2,7 @@
 use tokio::net::{TcpListener, TcpStream};
 use tokio::stream::{Stream, StreamExt};
 use tokio::sync::{mpsc, Mutex};
-use tokio_util::codec::{Framed, LinesCodec, LinesCodecError};
+use tokio_util::codec::{Framed, LinesCodec,BytesCodec, LinesCodecError};
 
 use futures::SinkExt;
 use std::collections::HashMap;
@@ -14,6 +14,7 @@ use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context, Poll};
 use crate::{RX_PORT};
+    use bytes::Bytes;
 
 
 pub async fn hi() -> Result<(), Box<dyn Error>>   {
@@ -66,14 +67,17 @@ pub async fn run(addr_clone: String,p1: mpsc::Sender<String>) -> Result<(), Box<
         let p1clone = p1.clone();
             tokio::spawn(async move {
                 // let mut lines = Framed::new(stream, LinesCodec::new());
-                let mut lines = Framed::with_capacity(stream, LinesCodec::new(), 8192);
+                // let mut lines = Framed::with_capacity(stream, LinesCodec::new(), 8192);
+                   let mut lines = Framed::new(stream, BytesCodec::new());
                 while let Some(msg) = lines.next().await {
                     match msg {
                         Ok(txt) => {
 
-                            println!("rx got:{}",txt);
+                            println!("rx got:{}",String::from_utf8(txt.to_vec()).unwrap());
 
-                            p1clone.send(txt).await.unwrap();
+                            // p1clone.send(txt).await.unwrap();
+                            p1clone.send( String::from_utf8(txt.to_vec()).unwrap() ).await.unwrap();
+
                         },
                         _ => println!("rx get nuffin"),
                     }
@@ -83,3 +87,6 @@ pub async fn run(addr_clone: String,p1: mpsc::Sender<String>) -> Result<(), Box<
 
     Ok(())
 }
+
+             
+

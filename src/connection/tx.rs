@@ -25,10 +25,18 @@ pub async fn run(addr_clone: String, c2: &mut mpsc::Receiver<String>) -> Result<
 
     let mut stream = TcpStream::connect(&addr).await?;
     let (mut r, mut w) = stream.into_split();
-    let mut sink = FramedWrite::new(w, LinesCodec::new());
+    // let mut sink = FramedWrite::new(w, LinesCodec::new());
+    let mut sink = FramedWrite::new(w, BytesCodec::new());
+
+    
     // filter map Result<BytesMut, Error> stream into just a Bytes stream to match stdout Sink
     // on the event of an Error, log the error and end the stream
-    let mut source = FramedRead::new(r, LinesCodec::new());
+
+    // let mut source = FramedRead::new(r, LinesCodec::new());
+    let mut source = FramedRead::new(r, BytesCodec::new());
+
+
+
     println!("tx estlibshed {}",addr);
     //     let inis="Please enter your username:".to_string();
 
@@ -54,7 +62,11 @@ pub async fn run(addr_clone: String, c2: &mut mpsc::Receiver<String>) -> Result<
 
         while let Some(mesg) = c2.recv().await {
             println!("sending {:?}", mesg );
-            sink.send(mesg).await.unwrap();
+            // sink.send(mesg).await.unwrap();           
+                 let mut input_bytes = mesg.as_bytes().to_vec();
+
+                sink.send(Bytes::copy_from_slice(&input_bytes)).await;
+
             // handle details
         }
 

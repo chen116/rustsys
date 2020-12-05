@@ -43,10 +43,10 @@ pub async fn run(addr_clone: String, p1: mpsc::Sender<String>) -> Result<(), Box
                         Ok(txt) => {
                            
                            println!("len:{}",txt.len() );
-    let tot_str = format!("{} {}","YOYO", String::from_utf8(txt.to_vec()).unwrap().as_str()  );
+    // let tot_str = format!("{} {}","YOYO", String::from_utf8(txt.to_vec()).unwrap().as_str()  );
 
                            
-                            p1clone.send( tot_str.to_string() ).await.unwrap();
+                            p1clone.send( String::from_utf8(txt.to_vec()).unwrap() ).await.unwrap();
                         },
                         _ => println!("exter in get nuffin"),
                     }
