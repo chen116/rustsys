@@ -35,18 +35,14 @@ pub async fn run(addr_clone: String, p1: mpsc::Sender<String>) -> Result<(), Box
         println!("exter_in got cli: {}",addr.to_string() );
         let p1clone = p1.clone();
             tokio::spawn(async move {
-                let mut lines = Framed::new(stream, BytesCodec::new());
+                let mut lines = Framed::new(stream, LinesCodec::new_with_max_length(256));
 
                 
                 while let Some(msg) = lines.next().await {
                     match msg {
                         Ok(txt) => {
                            
-                           println!("len:{}",txt.len() );
-    let tot_str = format!("{} {}","YOYO", String::from_utf8(txt.to_vec()).unwrap().as_str()  );
-
-                           
-                            p1clone.send( tot_str.to_string() ).await.unwrap();
+                            p1clone.send(txt).await.unwrap();
                         },
                         _ => println!("exter in get nuffin"),
                     }

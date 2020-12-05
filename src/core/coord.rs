@@ -259,6 +259,27 @@ let wasm_bytess = include_bytes!("../wasm/fib.wasm");
                    }
 
                  _ => {               
+                let wasm_string = parts.next().unwrap().to_string();
+ let swasm_bytes =  wasm_string.as_bytes();
+
+ println!("wasm byte len:{}",swasm_bytes.len());
+ let store = Store::default();
+    let module = Module::from_binary(store.engine(), swasm_bytes)?;
+    let instance = Instance::new(&store, &module, &[])?;
+
+    // Invoke `gcd` export
+    let func = instance
+        .get_func("fib")
+        .ok_or(anyhow::format_err!("failed to find `gcd` function export"))?
+        .get1::<i32, i32>()?;
+
+    println!("fib({}) = {}", 40, func(40 )?);
+
+
+
+
+
+
                         let db = db.clone();
                         // Like with other small servers, we'll `spawn` this client to ensure it
                         // runs concurrently with all other clients. The `move` keyword is used

@@ -15,6 +15,7 @@ use tokio::sync::mpsc;
 
 use structopt::StructOpt;
 use rustsys::{EXTER_IN_PORT};
+
 #[derive(StructOpt, Debug)]
 #[structopt(name = "fogsys-server", version = env!("CARGO_PKG_VERSION"), author = env!("CARGO_PKG_AUTHORS"), about = "A Redis server")]
 struct Remote_host {
@@ -51,10 +52,10 @@ pub async fn main() ->Result<(), Box<dyn Error>> {
 
 
     let (mut r, mut w) = stream.into_split();
-    let mut sink = FramedWrite::new(w, BytesCodec::new());
+    let mut sink = FramedWrite::new(w, LinesCodec::new());
     // filter map Result<BytesMut, Error> stream into just a Bytes stream to match stdout Sink
     // on the event of an Error, log the error and end the stream
-    let mut source = FramedRead::new(r, BytesCodec::new());
+    let mut source = FramedRead::new(r, LinesCodec::new());
 
     let inis="enter your command:".to_string();
 
@@ -72,17 +73,16 @@ pub async fn main() ->Result<(), Box<dyn Error>> {
 
       });
 
+
             loop {
                 let mut input = String::new();
-               
                 io::stdin().read_line(&mut input).unwrap();
                 input.pop();
-
-
-                 let wasm_bytes = include_bytes!("../wasm/fib.wasm");
+                
                 
 
-                victxclone.send(Bytes::copy_from_slice(wasm_bytes)).await;
+
+                victxclone.send(input).await;
             //  for n in 1..4 {
 
             //     victxclone.send(n.to_string()).await;

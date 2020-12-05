@@ -77,12 +77,9 @@ pub async fn main() ->Result<(), Box<dyn Error>> {
                
                 io::stdin().read_line(&mut input).unwrap();
                 input.pop();
-
-
-                 let wasm_bytes = include_bytes!("../wasm/fib.wasm");
                 
 
-                victxclone.send(Bytes::copy_from_slice(wasm_bytes)).await;
+                victxclone.send(Bytes::copy_from_slice(input.as_bytes())).await;
             //  for n in 1..4 {
 
             //     victxclone.send(n.to_string()).await;
