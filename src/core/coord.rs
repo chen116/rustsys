@@ -199,10 +199,30 @@ apps: app::App  )
 
 
                   },
+                  Some("GETWASM") => {
+                  let wasm_string = parts.next().unwrap().to_string();
+                  let swasm_bytes =  wasm_string.as_bytes();
+
+                  println!("wasm byte len:{}",swasm_bytes.len());
+                  let store = Store::default();
+                      let module = Module::from_binary(store.engine(), swasm_bytes)?;
+                      let instance = Instance::new(&store, &module, &[])?;
+
+                      // Invoke `gcd` export
+                      let func = instance
+                          .get_func("fib")
+                          .ok_or(anyhow::format_err!("failed to find `gcd` function export"))?
+                          .get1::<i32, i32>()?;
+
+                      println!("fib({}) = {}", 40, func(40 )?);
+
+
+                  },
                   Some("SENDWASM") =>{
                     let mut part2s =  (parts.next().unwrap()).splitn(4, ' ');
+                    let host =  part2s.next().unwrap().to_string() ;
                     
-                    let tx_p = nb.get(&(  part2s.next().unwrap().to_string()   )).unwrap() ;
+                    let tx_p = nb.get(&(  host   )).unwrap() ;
                     let wasm_file_name =  part2s.next().unwrap().to_string() ;
 
 
@@ -211,7 +231,6 @@ apps: app::App  )
 
                     let wasm_path = format!("/home/vic/rust/rustsys/src/wasm/{}.wasm",wasm_file_name).to_string();
 
-                    // tx_p.send(part2s.next().unwrap().to_string()).await;
 
 
 
@@ -226,7 +245,11 @@ apps: app::App  )
                           let mut total_bytes = vec![];
                           readfile.read_to_end(&mut total_bytes).await;
                           println!("{:?} {}",total_bytes,total_bytes.len() );
-                          victxclone.send(Bytes::copy_from_slice(&total_bytes)).await;
+                          // victxclone.send(Bytes::copy_from_slice(&total_bytes)).await;
+                          let str_wasm_full = format!("GETWASM {}",String::from_utf8(total_bytes).unwrap()).to_string();
+
+                          tx_p.send(str_wasm_full).await;
+
                         },                                                  
                         Err(error) => {                                                    
                             panic!("Problem opening the file: {:?}", error)                
