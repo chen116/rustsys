@@ -200,11 +200,13 @@ apps: app::App  )
 
                   },
                   Some("GETWASM") => {
+
+tokio::spawn(async move {
+
                     let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
                       let param = part2s.next().unwrap().to_string().parse::<i32>().unwrap();;
                   let wasm_string = part2s.next().unwrap().to_string();
                   let swasm_bytes =  wasm_string.as_bytes();
-
                   println!("wasm byte len:{}",swasm_bytes.len());
                   let store = Store::default();
                       let module = Module::from_binary(store.engine(), swasm_bytes)?;
@@ -218,7 +220,7 @@ apps: app::App  )
 
                       println!("fib({}) = {}", param, func(param )?);
 
-
+});
                   },
                   Some("SENDWASM") =>{
                     let mut part2s =  (parts.next().unwrap()).splitn(3, ' ');
