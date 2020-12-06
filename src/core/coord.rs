@@ -200,7 +200,7 @@ apps: app::App  )
 
                   },
                   Some("GETWASM") => {
-                    let part2s =  (parts.next().unwrap()).splitn(2, ' ');
+                    let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
                       let param = part2s.next().unwrap().to_string().parse::<i32>().unwrap();;
                   let wasm_string = part2s.next().unwrap().to_string();
                   let swasm_bytes =  wasm_string.as_bytes();
@@ -221,7 +221,7 @@ apps: app::App  )
 
                   },
                   Some("SENDWASM") =>{
-                    let part2s =  (parts.next().unwrap()).splitn(4, ' ');
+                    let mut part2s =  (parts.next().unwrap()).splitn(4, ' ');
                     let host =  part2s.next().unwrap().to_string() ;
                     
                     
