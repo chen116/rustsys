@@ -200,25 +200,25 @@ apps: app::App  )
 
                   },
                   Some("GETWASM") => {
-
+                                         let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
+                      let param = part2s.next().unwrap().to_string().parse::<i32>().unwrap();;
+                  let wasm_string = part2s.next().unwrap().to_string(); 
 tokio::spawn(async move {
 
-                    let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
-                      let param = part2s.next().unwrap().to_string().parse::<i32>().unwrap();;
-                  let wasm_string = part2s.next().unwrap().to_string();
+
                   let swasm_bytes =  wasm_string.as_bytes();
                   println!("wasm byte len:{}",swasm_bytes.len());
                   let store = Store::default();
-                      let module = Module::from_binary(store.engine(), swasm_bytes)?;
-                      let instance = Instance::new(&store, &module, &[])?;
+                      let module = Module::from_binary(store.engine(), swasm_bytes).unwrap();
+                      let instance = Instance::new(&store, &module, &[]).unwrap();
 
                       // Invoke `gcd` export
                       let func = instance
                           .get_func("fib")
-                          .ok_or(anyhow::format_err!("failed to find `gcd` function export"))?
-                          .get1::<i32, i32>()?;
+                          .ok_or(anyhow::format_err!("failed to find `gcd` function export")).unwrap()
+                          .get1::<i32, i32>().unwrap();
 
-                      println!("fib({}) = {}", param, func(param )?);
+                      println!("fib({}) = {}", param, func(param ).unwrap());
 
 });
                   },
