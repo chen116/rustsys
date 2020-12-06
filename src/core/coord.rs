@@ -221,7 +221,7 @@ apps: app::App  )
 
                   },
                   Some("SENDWASM") =>{
-                    let mut part2s =  (parts.next().unwrap()).splitn(4, ' ');
+                    let mut part2s =  (parts.next().unwrap()).splitn(3, ' ');
                     let host =  part2s.next().unwrap().to_string() ;
                     
                     
