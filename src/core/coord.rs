@@ -200,7 +200,9 @@ apps: app::App  )
 
                   },
                   Some("GETWASM") => {
-                  let wasm_string = parts.next().unwrap().to_string();
+                    let part2s =  (parts.next().unwrap()).splitn(2, ' ');
+                      let param = part2s.next().unwrap().to_string().parse::<i32>().unwrap();;
+                  let wasm_string = part2s.next().unwrap().to_string();
                   let swasm_bytes =  wasm_string.as_bytes();
 
                   println!("wasm byte len:{}",swasm_bytes.len());
@@ -214,15 +216,15 @@ apps: app::App  )
                           .ok_or(anyhow::format_err!("failed to find `gcd` function export"))?
                           .get1::<i32, i32>()?;
 
-                      println!("fib({}) = {}", 40, func(40 )?);
+                      println!("fib({}) = {}", param, func(param )?);
 
 
                   },
                   Some("SENDWASM") =>{
-                    let mut part2s =  (parts.next().unwrap()).splitn(4, ' ');
+                    let part2s =  (parts.next().unwrap()).splitn(4, ' ');
                     let host =  part2s.next().unwrap().to_string() ;
                     
-                    let tx_p = nb.get(&(  host   )).unwrap() ;
+                    
                     let wasm_file_name =  part2s.next().unwrap().to_string() ;
 
 
@@ -233,7 +235,7 @@ apps: app::App  )
 
 
 
-
+                    let tx_p = nb.get(&(  host   )).unwrap() ;
                     tokio::spawn(async move {
                     let file = File::open(&wasm_path).await;
                     println!("{} {} {}",host,wasm_path,param );
@@ -246,7 +248,7 @@ apps: app::App  )
                           readfile.read_to_end(&mut total_bytes).await;
                           println!("{:?} {}",total_bytes,total_bytes.len() );
                           // victxclone.send(Bytes::copy_from_slice(&total_bytes)).await;
-                          let str_wasm_full = format!("GETWASM {}",String::from_utf8(total_bytes).unwrap()).to_string();
+                          let str_wasm_full = format!("GETWASM {} {}",param,String::from_utf8(total_bytes).unwrap()).to_string();
 
                           tx_p.send(str_wasm_full).await;
 
