@@ -42,7 +42,7 @@ pub async fn run(addr_clone: String, p1: mpsc::Sender<String>) -> Result<(), Box
                     match msg {
                         Ok(txt) => {
                            
-                           println!("len:{}",txt.len() );
+                            println!("len:{}",txt.len() );
     // let tot_str = format!("{} {}","YOYO", String::from_utf8(txt.to_vec()).unwrap().as_str()  );
 
                            
