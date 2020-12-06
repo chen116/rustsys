@@ -79,10 +79,10 @@ pub async fn main() ->Result<(), Box<dyn Error>> {
                 input.pop();
               
                  let total_bytes = input.as_bytes().to_vec();
+                 
                 // input.push(' ');
                 // let mut input_bytes = input.as_bytes();
                 //  let mut wasm_bytes = include_bytes!("../wasm/fib.wasm");
-
                 //  let total_bytes = [input_bytes,wasm_bytes].concat();
                 
 
