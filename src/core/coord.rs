@@ -15,7 +15,8 @@ use wasmtime::*;
 use hello_world::greeter_client::GreeterClient;
 use hello_world::HelloRequest;
 
-
+use tokio::fs::File;
+use tokio::prelude::*; 
 
 pub mod hello_world {
     tonic::include_proto!("helloworld");
@@ -52,61 +53,8 @@ apps: app::App  )
              let mut parts = mesg.splitn(2, ' ');
 
              match parts.next() {
-               Some("SENDWASM") => {
-                 //host param
-                  let mut part2s =  (parts.next().unwrap()).splitn(3, ' ');
-                  let host = part2s.next().unwrap().to_string();
-                  let param = part2s.next().unwrap().to_string();
-                  let wasm_bytes = include_bytes!("../wasm/fib.wasm");
-                  let wasm_string = match String::from_utf8(wasm_bytes.to_vec()) {
-                      Ok(v) => v,
-                      Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
-                  };
 
-                   let tx_p = nb.get(&(host   )).unwrap() ;
-
-                          let info = format!("GETWASM {} {}",param,wasm_string);
-                            
-
-                              tx_p.send(   info.to_string()).await;
-                            
-
-
-               },
-               Some("GETWASM") =>{
-                 //param wasm_string
-                let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
-                let param = part2s.next().unwrap().to_string();
-                let wasm_string = part2s.next().unwrap().to_string();
- let swasm_bytes =  wasm_string.as_bytes();
-
-
-
-let wasm_bytess = include_bytes!("../wasm/fib.wasm");
-    let s = match String::from_utf8(wasm_bytess.to_vec()) {
-        Ok(v) => v,
-        Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
-    };
-    let swasm_bytess = s.as_bytes();
-
-
- println!("{}",wasm_string.len());
- println!("kkkk");
- println!("{}",s.len());
-
-    let store = Store::default();
-    let module = Module::from_binary(store.engine(), swasm_bytes)?;
-    let instance = Instance::new(&store, &module, &[])?;
-
-    // Invoke `gcd` export
-    let func = instance
-        .get_func("fib")
-        .ok_or(anyhow::format_err!("failed to find `gcd` function export"))?
-        .get1::<i32, i32>()?;
-
-    println!("fib({}) = {}", param, func( param.parse::<i32>().unwrap())?);
-
-               },
+ 
 
 
                  Some("NEWHOST") => { 
@@ -251,6 +199,52 @@ let wasm_bytess = include_bytes!("../wasm/fib.wasm");
 
 
                   },
+                  Some("SENDWASM") =>{
+                    let mut part2s =  (parts.next().unwrap()).splitn(4, ' ');
+                    
+                    let tx_p = nb.get(&(  part2s.next().unwrap().to_string()   )).unwrap() ;
+                    let wasm_file_name =  part2s.next().unwrap().to_string() ;
+
+
+                    let param =  part2s.next().unwrap().to_string() ;
+
+
+                    let wasm_path = format!("/home/vic/rust/rustsys/src/wasm/{}.wasm",wasm_file_name).to_string();
+
+                    // tx_p.send(part2s.next().unwrap().to_string()).await;
+
+
+
+                    tokio::spawn(async move {
+                    let file = File::open(&wasm_path).await;
+                    println!("{} {} {}",host,wasm_path,param );
+
+                    
+
+                     match file {                                                
+                        Ok(mut readfile) => { 
+                          let mut total_bytes = vec![];
+                          readfile.read_to_end(&mut total_bytes).await;
+                          println!("{:?} {}",total_bytes,total_bytes.len() );
+                          victxclone.send(Bytes::copy_from_slice(&total_bytes)).await;
+                        },                                                  
+                        Err(error) => {                                                    
+                            panic!("Problem opening the file: {:?}", error)                
+                        }                                                                
+};     
+
+                  
+                            });
+
+
+
+
+                    
+                  },
+
+
+
+
                    Some("RESPONSE") => { 
 
                      println!("RESPONSE {}",parts.next().unwrap());
