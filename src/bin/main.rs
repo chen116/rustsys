@@ -19,10 +19,26 @@ use tokio::sync::watch;
 
 use std::process::Command;
 
+
+
+use structopt::StructOpt;
+#[derive(StructOpt, Debug)]
+#[structopt(name = "fogsys-server", version = env!("CARGO_PKG_VERSION"), author = env!("CARGO_PKG_AUTHORS"), about = "rustsys")]
+struct Discovery_or_local {
+
+
+
+    #[structopt(name = "compute_env", long = "--env", default_value = "local")]
+    host: String,
+
+
+
+}
+
+
+
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn Error>>  {
-
-
 
     // println!("{:?}", network().unwrap().ip); // 192.168.43.134
     // println!("{:?}", local().unwrap()); // 127.0.0.1
@@ -32,7 +48,44 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
     //     println!("ip:{}",ip.to_string());
     // } 
 
-    // let mut addr = "127.0.0.1".to_string();
+    let mut addr = "127.0.0.1".to_string();
+    
+    let compute_env = Discovery_or_local::from_args();
+
+    match compute_env.host.as_str() {
+        "local" => {
+
+            for iface in datalink::interfaces() {
+                // println!("{:?}",iface);
+                match iface.is_up(){
+                    true   => {
+                        match iface.ips.len() {
+                            0 => {},
+                        _ => match iface.ips[0].ip().to_string().contains("127.") || iface.ips[0].ip().to_string().contains("172.") {
+                                false => 
+                                { 
+                                    addr = iface.ips[0].ip().to_string();
+                                },
+                                _ => {}
+                                }
+                            }
+                        },
+
+                    _ => {}
+                }
+            }
+
+        },
+        _ => {
+            let name = hostname::get()?;
+            addr = name.to_string_lossy().to_string().clone();
+        }
+
+    }
+
+
+
+
     // for iface in datalink::interfaces() {
     //     // println!("{:?}",iface);
     //     match iface.is_up(){
@@ -53,8 +106,8 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
     //     }
     // }
 
-    let name = hostname::get()?;
-    let mut addr = name.to_string_lossy().to_string().clone();
+    // let name = hostname::get()?;
+    // let mut addr = name.to_string_lossy().to_string().clone();
 
 
 
