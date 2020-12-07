@@ -32,26 +32,32 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
     //     println!("ip:{}",ip.to_string());
     // } 
 
-    let mut addr = "127.0.0.1".to_string();
-    for iface in datalink::interfaces() {
-        // println!("{:?}",iface);
-        match iface.is_up(){
-            true   => {
-                match iface.ips.len() {
-                    0 => {},
-                   _ => match iface.ips[0].ip().to_string().contains("127.") || iface.ips[0].ip().to_string().contains("172.") {
-                        false => 
-                        { 
-                            addr = iface.ips[0].ip().to_string();
-                        },
-                        _ => {}
-                        }
-                    }
-                },
+    // let mut addr = "127.0.0.1".to_string();
+    // for iface in datalink::interfaces() {
+    //     // println!("{:?}",iface);
+    //     match iface.is_up(){
+    //         true   => {
+    //             match iface.ips.len() {
+    //                 0 => {},
+    //                _ => match iface.ips[0].ip().to_string().contains("127.") || iface.ips[0].ip().to_string().contains("172.") {
+    //                     false => 
+    //                     { 
+    //                         addr = iface.ips[0].ip().to_string();
+    //                     },
+    //                     _ => {}
+    //                     }
+    //                 }
+    //             },
 
-            _ => {}
-        }
-    }
+    //         _ => {}
+    //     }
+    // }
+
+    let name = hostname::get()?;
+    let mut addr = name.to_string_lossy().to_string().clone();
+
+
+
     // let addr = addr + ":6142";
     println!("addr is: {}",addr);
     let (mut p1, mut c1) = mpsc::channel(32);
