@@ -199,10 +199,34 @@ apps: app::App  )
 
 
                   },
+                  Some("GETWASM") => {
+                                         let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
+                      let param = part2s.next().unwrap().to_string().parse::<i32>().unwrap();;
+                  let wasm_string = part2s.next().unwrap().to_string(); 
+tokio::spawn(async move {
+
+
+                  let swasm_bytes =  wasm_string.as_bytes();
+                  println!("wasm byte len:{}",swasm_bytes.len());
+                  let store = Store::default();
+                      let module = Module::from_binary(store.engine(), swasm_bytes).unwrap();
+                      let instance = Instance::new(&store, &module, &[]).unwrap();
+
+                      // Invoke `gcd` export
+                      let func = instance
+                          .get_func("fib")
+                          .ok_or(anyhow::format_err!("failed to find `gcd` function export")).unwrap()
+                          .get1::<i32, i32>().unwrap();
+
+                      println!("fib({}) = {}", param, func(param ).unwrap());
+
+});
+                  },
                   Some("SENDWASM") =>{
-                    let mut part2s =  (parts.next().unwrap()).splitn(4, ' ');
+                    let mut part2s =  (parts.next().unwrap()).splitn(3, ' ');
+                    let host =  part2s.next().unwrap().to_string() ;
                     
-                    let tx_p = nb.get(&(  part2s.next().unwrap().to_string()   )).unwrap() ;
+                    
                     let wasm_file_name =  part2s.next().unwrap().to_string() ;
 
 
@@ -211,10 +235,9 @@ apps: app::App  )
 
                     let wasm_path = format!("/home/vic/rust/rustsys/src/wasm/{}.wasm",wasm_file_name).to_string();
 
-                    // tx_p.send(part2s.next().unwrap().to_string()).await;
 
 
-
+                    let tx_p = nb.get(&(  host   )).unwrap() ;
                     tokio::spawn(async move {
                     let file = File::open(&wasm_path).await;
                     println!("{} {} {}",host,wasm_path,param );
@@ -226,7 +249,11 @@ apps: app::App  )
                           let mut total_bytes = vec![];
                           readfile.read_to_end(&mut total_bytes).await;
                           println!("{:?} {}",total_bytes,total_bytes.len() );
-                          victxclone.send(Bytes::copy_from_slice(&total_bytes)).await;
+                          // victxclone.send(Bytes::copy_from_slice(&total_bytes)).await;
+                          let str_wasm_full = format!("GETWASM {} {}",param,String::from_utf8(total_bytes).unwrap()).to_string();
+
+                          tx_p.send(str_wasm_full).await;
+
                         },                                                  
                         Err(error) => {                                                    
                             panic!("Problem opening the file: {:?}", error)                
