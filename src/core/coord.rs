@@ -233,7 +233,7 @@ tokio::spawn(async move {
                     let param =  part2s.next().unwrap().to_string() ;
 
 
-                    let wasm_path = format!("/home/vic/rust/rustsys/src/wasm/{}.wasm",wasm_file_name).to_string();
+                    let wasm_path = format!("../wasm/{}.wasm",wasm_file_name).to_string();
 
 
 
