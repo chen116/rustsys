@@ -17,7 +17,7 @@ use hello_world::HelloRequest;
 
 use tokio::fs::File;
 use tokio::prelude::*; 
-
+extern crate dirs;
 pub mod hello_world {
     tonic::include_proto!("helloworld");
 }
@@ -233,7 +233,9 @@ tokio::spawn(async move {
                     let param =  part2s.next().unwrap().to_string() ;
 
 
-                    let wasm_path = format!("../wasm/{}.wasm",wasm_file_name).to_string();
+                    let wasm_path = format!("{}/rust/rustsys/src/wasm/{}.wasm",
+                    dirs::home_dir().unwrap().into_os_string().into_string().unwrap()
+                    ,wasm_file_name).to_string();
 
 
 

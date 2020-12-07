@@ -522,6 +522,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "dirs"
+version = "3.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "142995ed02755914747cc6ca76fc7e4583cd18578746716d0508ea6ed558b9ff"
+dependencies = [
+ "dirs-sys",
+]
+
+[[package]]
 name = "dirs-sys"
 version = "0.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1824,6 +1833,7 @@ dependencies = [
  "anyhow",
  "async-stream",
  "bytes 0.6.0",
+ "dirs 3.0.1",
  "dns-lookup",
  "env_logger 0.5.13",
  "futures",
@@ -1992,7 +2002,7 @@ version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9a2b22262a9aaf9464d356f656fea420634f78c881c5eebd5ef5e66d8b9bc603"
 dependencies = [
- "dirs",
+ "dirs 2.0.2",
 ]
 
 [[package]]
