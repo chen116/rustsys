@@ -58,7 +58,7 @@ apps: app::App  )
  
 
 
-                 Some("NEWHOST") => { 
+                 Some("NEWCLOUDLET") => { 
                     dy_tx_p.send(parts.next().unwrap().to_string()).await;
                   },
                   Some("CLOUDLETS") => { 
@@ -211,7 +211,8 @@ tokio::spawn(async move {
 
 
                   let swasm_bytes =  wasm_string.as_bytes();
-                  println!("wasm byte len:{},from: {}, func param: {}",swasm_bytes.len(),remote_caller,param);
+                  // println!("wasm byte len:{},from: {}, func param: {}",swasm_bytes.len(),remote_caller,param);
+                  println!("wasm byte from: {}, func param: {}",remote_caller,param);
                   let store = Store::default();
                       let module = Module::from_binary(store.engine(), swasm_bytes).unwrap();
                       let instance = Instance::new(&store, &module, &[]).unwrap();
@@ -224,7 +225,7 @@ tokio::spawn(async move {
 
                       let res = func(param ).unwrap();
 
-                      println!("Result: fib({}) = {}", param,res );
+                      println!("Result: func({}) = {}", param,res );
                       
                       // let info = format!("RESPONSE {}",res);
                       // let nb_clone = nb.clone();
