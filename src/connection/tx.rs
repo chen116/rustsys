@@ -61,7 +61,7 @@ pub async fn run(addr_clone: String, c2: &mut mpsc::Receiver<String>) -> Result<
 
 
         while let Some(mesg) = c2.recv().await {
-            println!("sending {:?}", mesg );
+            // println!("sending {:?}", mesg );
             // sink.send(mesg).await.unwrap();           
                  let mut input_bytes = mesg.as_bytes().to_vec();
 

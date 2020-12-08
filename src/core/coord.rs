@@ -49,7 +49,7 @@ apps: app::App  )
 
     // println!("sender watch: {:?}",tx_dy_sender);
         while let Some(mesg) = c1.recv().await {
-            println!("coord c1 got {:?}", mesg );
+            // println!("coord c1 got {:?}", mesg );
              let mut parts = mesg.splitn(2, ' ');
 
              match parts.next() {
