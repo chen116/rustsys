@@ -73,7 +73,7 @@ pub async fn run(addr_clone: String,p1: mpsc::Sender<String>) -> Result<(), Box<
                     match msg {
                         Ok(txt) => {
 
-                            println!("rx got:{}",String::from_utf8(txt.to_vec()).unwrap());
+                            // println!("rx got:{}",String::from_utf8(txt.to_vec()).unwrap());
 
                             // p1clone.send(txt).await.unwrap();
                             p1clone.send( String::from_utf8(txt.to_vec()).unwrap() ).await.unwrap();
