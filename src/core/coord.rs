@@ -38,7 +38,7 @@ res
 
 
 
-pub async fn run(myaddr: String,c1: &mut mpsc::Receiver<String>, db: ets::SimpleEts, 
+pub async fn run(myaddr_ori: String,c1: &mut mpsc::Receiver<String>, db: ets::SimpleEts, 
 nb: neighbour::Neighbour, dy_tx_p: mpsc::Sender<String> , 
 apps: app::App  ) 
 -> Result<(), Box<dyn Error>>  {
@@ -49,6 +49,7 @@ apps: app::App  )
 
     // println!("sender watch: {:?}",tx_dy_sender);
         while let Some(mesg) = c1.recv().await {
+            let myaddr = myaddr_ori.clone();
             // println!("coord c1 got {:?}", mesg );
              let mut parts = mesg.splitn(2, ' ');
 
@@ -87,8 +88,9 @@ apps: app::App  )
                     });
                     let res = join_handle.await.unwrap();
                     println!("{}",res );
+
                     apps.set(app_name.clone(),myaddr.clone());
-                    let info = format!("UPDATEAPPS {} {}",app_name.clone(),myaddr.clone());
+                    let info = format!("UPDATEAPPS {} {}",app_name.clone(),myaddr);
                     let mut tx_ps = nb.all_neighbours();
                     while let Some(tx_p) = tx_ps.pop() {
                         tx_p.send(info.to_string()).await;
@@ -129,7 +131,7 @@ apps: app::App  )
                     let nb_clone = nb.clone();
                     let myaddr_clone = myaddr.clone();
 
-                    if host == myaddr {
+                    if host == myaddr_clone {
                       println!("run here");
                       if appname == "pi".to_string() {
                             tokio::spawn(async move {
@@ -200,37 +202,37 @@ apps: app::App  )
 
                   },
                   Some("GETWASM") => {
-                  let mut part2s =  (parts.next().unwrap()).splitn(3, ' ');
-                  let remote_caller = part2s.next().unwrap().to_string(); 
+                  let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
+                  // let remote_caller = part2s.next().unwrap().to_string(); 
 
                       let param = part2s.next().unwrap().to_string().parse::<i32>().unwrap();;
                   let wasm_string = part2s.next().unwrap().to_string(); 
-tokio::spawn(async move {
+// tokio::spawn(async move {
 
 
                   let swasm_bytes =  wasm_string.as_bytes();
-                  println!("wasm byte len:{},from: {}",swasm_bytes.len(),remote_caller);
+                  println!("wasm byte len:{},from: {}",swasm_bytes.len(),".");
                   let store = Store::default();
-                      let module = Module::from_binary(store.engine(), swasm_bytes).unwrap();
-                      let instance = Instance::new(&store, &module, &[]).unwrap();
+                      let module = Module::from_binary(store.engine(), swasm_bytes)?;
+                      let instance = Instance::new(&store, &module, &[])?;
 
                       // Invoke `gcd` export
                       let func = instance
                           .get_func("fib")
-                          .ok_or(anyhow::format_err!("failed to find `gcd` function export")).unwrap()
-                          .get1::<i32, i32>().unwrap();
+                          .ok_or(anyhow::format_err!("failed to find `gcd` function export"))?
+                          .get1::<i32, i32>()?;
 
-                      let res = func(param ).unwrap();
+                      let res = func(param )?;
 
                       println!("sending fib({}) = {}", param,res );
                       
-                      let info = format!("RESPONSE {}",res);
-                      let nb_clone = nb.clone();
-                      let tx_p = nb_clone.get(&( remote_caller   )).unwrap() ;
-                      tx_p.send(   info.to_string()).await;
+                      // let info = format!("RESPONSE {}",res);
+                      // let nb_clone = nb.clone();
+                      // let tx_p = nb_clone.get(&( remote_caller   )).unwrap() ;
+                      // tx_p.send(   info.to_string()).await;
 
 
-});
+// });
                   },
                   Some("SENDWASM") =>{
                     let mut part2s =  (parts.next().unwrap()).splitn(3, ' ');
@@ -254,7 +256,6 @@ tokio::spawn(async move {
                     let file = File::open(&wasm_path).await;
                     println!("{} {} {}",host,wasm_path,param );
 
-                    
 
                      match file {                                                
                         Ok(mut readfile) => { 
@@ -262,7 +263,7 @@ tokio::spawn(async move {
                           readfile.read_to_end(&mut total_bytes).await;
                           println!("{:?} {}",total_bytes,total_bytes.len() );
                           // victxclone.send(Bytes::copy_from_slice(&total_bytes)).await;
-                          let str_wasm_full = format!("GETWASM {} {} {}",myaddr.clone(),param,String::from_utf8(total_bytes).unwrap()).to_string();
+                          let str_wasm_full = format!("GETWASM {} {} {}",myaddr,param,String::from_utf8(total_bytes).unwrap()).to_string();
 
                           tx_p.send(str_wasm_full).await;
 
