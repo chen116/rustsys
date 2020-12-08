@@ -202,12 +202,12 @@ apps: app::App  )
 
                   },
                   Some("GETWASM") => {
-                  let mut part2s =  (parts.next().unwrap()).splitn(3, ' ');
-                  let remote_caller = part2s.next().unwrap().to_string(); 
+                  let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
+                  // let remote_caller = part2s.next().unwrap().to_string(); 
 
                       let param = part2s.next().unwrap().to_string().parse::<i32>().unwrap();
                   let wasm_string = part2s.next().unwrap().to_string(); 
-// tokio::spawn(async move {
+tokio::spawn(async move {
 
 
                   let swasm_bytes =  wasm_string.as_bytes();
@@ -226,13 +226,13 @@ apps: app::App  )
 
                       println!("sending fib({}) = {}", param,res );
                       
-                      let info = format!("RESPONSE {}",res);
-                      let nb_clone = nb.clone();
-                      let tx_p = nb_clone.get(&( remote_caller   )).unwrap() ;
-                      tx_p.send(   info.to_string()).await;
+                      // let info = format!("RESPONSE {}",res);
+                      // let nb_clone = nb.clone();
+                      // let tx_p = nb_clone.get(&( remote_caller   )).unwrap() ;
+                      // tx_p.send(   info.to_string()).await;
 
 
-// });
+});
                   },
                   Some("SENDWASM") =>{
                     let mut part2s =  (parts.next().unwrap()).splitn(3, ' ');
@@ -263,7 +263,7 @@ apps: app::App  )
                           readfile.read_to_end(&mut total_bytes).await;
                           println!("{:?} {}",total_bytes,total_bytes.len() );
                           // victxclone.send(Bytes::copy_from_slice(&total_bytes)).await;
-                          let str_wasm_full = format!("GETWASM {} {} {}",myaddr,param,String::from_utf8(total_bytes).unwrap()).to_string();
+                          let str_wasm_full = format!("GETWASM {} {}",param,String::from_utf8(total_bytes).unwrap()).to_string();
 
                           tx_p.send(str_wasm_full).await;
 
