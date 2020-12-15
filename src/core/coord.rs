@@ -24,7 +24,8 @@ pub mod hello_world {
 
 
 async fn create_new_app(app_name: String) -> String {
-let exec = format!("/home/vic/cpp_grpc/grpc/examples/cpp/helloworld/cmake/build/server_{}",app_name);
+// let exec = format!("/home/vic/cpp_grpc/grpc/examples/cpp/helloworld/cmake/build/server_{}",app_name);
+let exec = format!("/home1/chen116/grpc/examples/cpp/helloworld/cmake/build/server_{}",app_name);
 
 let mut _child = Command::new(exec)
                         .arg("")
@@ -104,7 +105,7 @@ apps: app::App  )
 
                   },
                   Some("SEND2APP") => { 
-                    let mut part2s =  (parts.next().unwrap()).splitn(3, ' ');
+                    let mut part2s =  (parts.next().unwrap()).splitn(4, ' ');
 
                     let appname =  part2s.next().unwrap().to_string() ;
                     let value =  part2s.next().unwrap().to_string() ;
@@ -207,6 +208,8 @@ apps: app::App  )
 
                       let param = part2s.next().unwrap().to_string().parse::<i32>().unwrap();
                   let wasm_string = part2s.next().unwrap().to_string(); 
+            let nbbb =  nbb.clone();
+
 tokio::spawn(async move {
 
 
@@ -223,15 +226,28 @@ tokio::spawn(async move {
                           .ok_or(anyhow::format_err!("failed to find `gcd` function export")).unwrap()
                           .get1::<i32, i32>().unwrap();
 
-                      let res = func(param ).unwrap();
+                      // let res = func(param ).unwrap();
 
-                      println!("Result: func({}) = {}", param,res );
+                      // println!("Result: func({}) = {}", param,res );
+
+                      match func(param )
+                      {
+                        Ok(res ) => {
+                              println!("Result: func({}) = {}", param,res );
+                              tokio::spawn(async move {
+
+                                                   let info = format!("RESPONSE {}",res);
                       
-                      // let info = format!("RESPONSE {}",res);
-                      // let nb_clone = nb.clone();
-                      // let tx_p = nb_clone.get(&( remote_caller   )).unwrap() ;
-                      // tx_p.send(   info.to_string()).await;
-
+                      let tx_p = nbbb.get(&( remote_caller   )).unwrap() ;
+                      tx_p.send(   info.to_string()).await;
+});
+                        },
+                        _=>{
+                          println!("not good wasm");
+                        }
+                      }
+                      
+ 
 
 });
                   },

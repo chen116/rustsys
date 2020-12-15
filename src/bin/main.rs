@@ -79,6 +79,8 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
         _ => {
             let name = hostname::get()?;
             addr = name.to_string_lossy().to_string().clone();
+            let mut parts = addr.splitn(2, '.'); // to convert xxx.hpc.usc.edu to xxx
+            addr = parts.next().unwrap().to_string();
         }
 
     }
