@@ -208,6 +208,8 @@ apps: app::App  )
 
                       let param = part2s.next().unwrap().to_string().parse::<i32>().unwrap();
                   let wasm_string = part2s.next().unwrap().to_string(); 
+            let nbbb =  nbb.clone();
+
 tokio::spawn(async move {
 
 
@@ -228,22 +230,24 @@ tokio::spawn(async move {
 
                       // println!("Result: func({}) = {}", param,res );
 
-
                       match func(param )
                       {
                         Ok(res ) => {
                               println!("Result: func({}) = {}", param,res );
+                              tokio::spawn(async move {
+
+                                                   let info = format!("RESPONSE {}",res);
+                      
+                      let tx_p = nbbb.get(&( remote_caller   )).unwrap() ;
+                      tx_p.send(   info.to_string()).await;
+});
                         },
                         _=>{
                           println!("not good wasm");
                         }
                       }
                       
-                      // let info = format!("RESPONSE {}",res);
-                      // let nb_clone = nb.clone();
-                      // let tx_p = nb_clone.get(&( remote_caller   )).unwrap() ;
-                      // tx_p.send(   info.to_string()).await;
-
+ 
 
 });
                   },
