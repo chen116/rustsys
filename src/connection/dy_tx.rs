@@ -12,7 +12,7 @@ use tokio_util::codec::{BytesCodec, FramedRead, FramedWrite};
 
 use tokio::sync::mpsc;
 use crate::{TX_PORT,RX_PORT};
-use crate::datastore::{ets,neighbour};
+use crate::datastore::{neighbour};
 use crate::connection::{tx};
 use tokio::sync::watch;
 
