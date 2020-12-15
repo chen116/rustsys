@@ -78,9 +78,9 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
         },
         _ => {
             let name = hostname::get()?;
-
-            let mut parts = name.to_string_lossy().to_string().splitn(2, '.');
-            addr = parts.next().clone();
+            addr = name.to_string_lossy().to_string().clone();
+            let mut parts = addr.splitn(2, '.');
+            addr = parts.next().unwrap().to_string();
         }
 
     }
