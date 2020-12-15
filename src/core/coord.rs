@@ -24,7 +24,12 @@ pub mod hello_world {
 
 async fn create_new_app(app_name: String) -> String {
 // let exec = format!("/home/vic/cpp_grpc/grpc/examples/cpp/helloworld/cmake/build/server_{}",app_name);
-let exec = format!("/home1/chen116/grpc/examples/cpp/helloworld/cmake/build/server_{}",app_name);
+
+                    let exec = format!("{}/cpp_grpc/grpc/examples/cpp/helloworld/cmake/build/server_{}",
+                    dirs::home_dir().unwrap().into_os_string().into_string().unwrap()
+                    ,app_name).to_string();
+
+
 
 let mut _child = Command::new(exec)
                         .arg("")
