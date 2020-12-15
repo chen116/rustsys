@@ -105,7 +105,7 @@ apps: app::App  )
 
                   },
                   Some("SEND2APP") => { 
-                    let mut part2s =  (parts.next().unwrap()).splitn(3, ' ');
+                    let mut part2s =  (parts.next().unwrap()).splitn(4, ' ');
 
                     let appname =  part2s.next().unwrap().to_string() ;
                     let value =  part2s.next().unwrap().to_string() ;
