@@ -227,6 +227,17 @@ tokio::spawn(async move {
                       let res = func(param ).unwrap();
 
                       println!("Result: func({}) = {}", param,res );
+
+
+                      match func(param )
+                      {
+                        Ok(res ) => {
+                              println!("Result: func({}) = {}", param,res );
+                        },
+                        _=>{
+                          println!("not good wasm");
+                        }
+                      }
                       
                       // let info = format!("RESPONSE {}",res);
                       // let nb_clone = nb.clone();
