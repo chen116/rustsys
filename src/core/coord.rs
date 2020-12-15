@@ -64,7 +64,7 @@ apps: app::App  )
 
 
                  Some("NEWHOST") => { 
-                    dy_tx_p.send(parts.next().unwrap().to_string()).await;
+                    dy_tx_p.send(parts.next().unwrap().to_string()).await.expect("could not send");
                   },
                   Some("HOSTS") => { 
 
@@ -83,7 +83,7 @@ apps: app::App  )
                  Some("SEND2HOST") => { 
                     let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
                     let tx_p = nb.get(&(  part2s.next().unwrap().to_string()   )).unwrap() ;
-                    tx_p.send(part2s.next().unwrap().to_string()).await;
+                    tx_p.send(part2s.next().unwrap().to_string()).await.expect("could not send");
                   },
                  Some("NEWAPP") => { 
                     let app_name = parts.next().unwrap().to_string();
@@ -98,7 +98,7 @@ apps: app::App  )
                     let info = format!("UPDATEAPPS {} {}",app_name.clone(),myaddr);
                     let mut tx_ps = nb.all_neighbours();
                     while let Some(tx_p) = tx_ps.pop() {
-                        tx_p.send(info.to_string()).await;
+                        tx_p.send(info.to_string()).await.expect("could not send");
                     }
   
                   },
@@ -113,13 +113,13 @@ apps: app::App  )
 
                     let appname =  part2s.next().unwrap().to_string() ;
                     let value =  part2s.next().unwrap().to_string() ;
-                    let mut remoteCaller = "none".to_string();
-                          let originHost = part2s.next() ;
-                          match originHost {
+                    let mut remote_caller = "none".to_string();
+                          let origin_host = part2s.next() ;
+                          match origin_host {
                             Some(inner) =>
                             {
                              
-                              remoteCaller = inner.to_string().clone();
+                              remote_caller = inner.to_string().clone();
                             }
                              ,
                             None => {
@@ -127,7 +127,7 @@ apps: app::App  )
                               
                             },
                           }
-                   println!("from HOST {}",remoteCaller);
+                   println!("from HOST {}",remote_caller);
 
 
 
@@ -152,11 +152,11 @@ apps: app::App  )
 
                             let info = format!("RESPONSE {}({})={}",appname,value,resStr);
                             
-                            if remoteCaller != "none".to_string()
+                            if remote_caller != "none".to_string()
                             {
                                
-                              let tx_p = nb_clone.get(&( remoteCaller   )).unwrap() ;
-                              tx_p.send(   info.to_string()).await;
+                              let tx_p = nb_clone.get(&( remote_caller   )).unwrap() ;
+                              tx_p.send(   info.to_string()).await.expect("could not send");
                             }
                             else{
                               println!("{}",info );
@@ -179,11 +179,11 @@ apps: app::App  )
 
                             let info = format!("RESPONSE {}({})={}",appname,value,resStr);
                             
-                            if remoteCaller != "none".to_string()
+                            if remote_caller != "none".to_string()
                             {
                                
-                              let tx_p = nb_clone.get(&( remoteCaller   )).unwrap() ;
-                              tx_p.send(   info.to_string()).await;
+                              let tx_p = nb_clone.get(&( remote_caller   )).unwrap() ;
+                              tx_p.send(   info.to_string()).await.expect("could not send");
                             }
                             else{
                               println!("{}",info );
@@ -201,7 +201,7 @@ apps: app::App  )
                     let tx_p = nb.get(&(host)).unwrap() ;
                     let info = format!("SEND2APP {} {} {}",appname,value,myaddr.clone());
 
-                    tx_p.send( info.to_string() ).await;
+                    tx_p.send( info.to_string() ).await.expect("could not send");
                     }
 
 
@@ -243,7 +243,7 @@ tokio::spawn(async move {
                                                    let info = format!("RESPONSE {}",res);
                       
                       let tx_p = nbbb.get(&( remote_caller   )).unwrap() ;
-                      tx_p.send(   info.to_string()).await;
+                      tx_p.send(   info.to_string()).await.expect("could not send");
 });
                         },
                         _=>{
@@ -281,12 +281,12 @@ tokio::spawn(async move {
                      match file {                                                
                         Ok(mut readfile) => { 
                           let mut total_bytes = vec![];
-                          readfile.read_to_end(&mut total_bytes).await;
+                          readfile.read_to_end(&mut total_bytes).await.expect("could not read");
                           println!("{:?} {}",total_bytes,total_bytes.len() );
                           // victxclone.send(Bytes::copy_from_slice(&total_bytes)).await;
                           let str_wasm_full = format!("GETWASM {} {} {}",myaddr,param,String::from_utf8(total_bytes).unwrap()).to_string();
 
-                          tx_p.send(str_wasm_full).await;
+                          tx_p.send(str_wasm_full).await.expect("could not send");
 
                         },                                                  
                         Err(error) => {                                                    
