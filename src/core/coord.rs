@@ -59,12 +59,12 @@ apps: app::App  )
  
 
 
-                 Some("NEWCLOUDLET") => { 
+                 Some("NEWHOST") => { 
                     dy_tx_p.send(parts.next().unwrap().to_string()).await;
                   },
-                  Some("CLOUDLETS") => { 
+                  Some("HOSTS") => { 
 
-                      println!("Connected Cloudlets:");
+                      println!("Connected HOSTs:");
                       nb.list();
                     // println!("{:?}",nb.get(&("hi".to_string())).unwrap());
                     // println!("LIST {:?}", nb.get(&(  parts.next().unwrap().to_string()   )).unwrap()   );
