@@ -4,9 +4,7 @@ pub const TX_PORT: &str = "8083";
 pub const APP_RX_PORT: &str = "8084";
 
 
-pub mod server;
-pub mod client;
-pub mod stdcli;
+
 pub mod datastore;
 pub mod connection;
 pub mod core;
