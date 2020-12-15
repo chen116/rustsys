@@ -79,7 +79,7 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
         _ => {
             let name = hostname::get()?;
 
-            let mut parts = mesg.to_string_lossy().to_string().splitn(2, '.');
+            let mut parts = name.to_string_lossy().to_string().splitn(2, '.');
             addr = parts.next().clone();
         }
 
