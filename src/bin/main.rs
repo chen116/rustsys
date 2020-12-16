@@ -75,8 +75,8 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
 
     // let addr = addr + ":6142";
     println!("addr is: {}",addr);
-    let (mut p1, mut c1) = mpsc::channel(32);
-    let (mut p2, mut c2) = mpsc::channel(32);
+    let ( p1, mut c1) = mpsc::channel(32);
+    let ( p2, mut c2) = mpsc::channel(32);
     // let (mut p3, mut c3) = mpsc::channel(32);
 
 
@@ -102,14 +102,14 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
 
     let addr_clone = addr.clone();
     let p1_clone = p1.clone();
-    let exter_in = tokio::spawn(async move { 
-        exter_in::run(addr_clone,p1_clone).await;
+    let _exter_in = tokio::spawn(async move { 
+        exter_in::run(addr_clone,p1_clone).await.expect("fail");
     });
 
     let addr_clone = addr.clone();
     let p1_clone = p1.clone();
     let rx = tokio::spawn(async move { 
-        rx::run(addr_clone,p1_clone).await;
+        rx::run(addr_clone,p1_clone).await.expect("fail");
     });
 
     // let addr_clone = addr.clone();
@@ -121,14 +121,14 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
     let nb_clone = nb.clone();
     let apps_clone = apps.clone();
     let coord = tokio::spawn(async move { 
-        coord::run(addr,&mut c1,nb_clone,p2,apps_clone).await;
+        coord::run(addr,&mut c1,nb_clone,p2,apps_clone).await.expect("fail");
     });
 
 
 
     let nb_clone = nb.clone();
-    let dy_tx = tokio::spawn(async move { 
-        dy_tx::run(nb_clone,&mut c2).await;
+    let _dy_tx = tokio::spawn(async move { 
+        dy_tx::run(nb_clone,&mut c2).await.expect("fail");
     });
 
 
