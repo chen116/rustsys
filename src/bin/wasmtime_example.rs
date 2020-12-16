@@ -19,8 +19,8 @@ let wasm_bytes = include_bytes!("../wasm/fib.wasm");
 
     // Invoke `gcd` export
     let func = instance
-        .get_func("fib")
-        .ok_or(anyhow::format_err!("failed to find `gcd` function export"))?
+        .get_func("func")
+        .ok_or(anyhow::format_err!("failed to find function export"))?
         .get1::<i32, i32>()?;
 
     println!("Result {}", func(25)?);
