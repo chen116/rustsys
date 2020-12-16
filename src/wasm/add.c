@@ -1,3 +1,3 @@
-int add(int f,int g){
+int func(int f,int g){
     return g+f;
 }

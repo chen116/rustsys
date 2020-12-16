@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-int main()
+int func()
 {
 printf("hi");
 return 0;
