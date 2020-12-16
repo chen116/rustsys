@@ -238,7 +238,15 @@ tokio::spawn(async move {
 
 
 
-                    let tx_p = nb.get(&(  host   )).unwrap() ;
+
+
+
+
+                  let nbb_clone=nbb.clone();
+
+
+
+
                     tokio::spawn(async move {
                     let file = File::open(&wasm_path).await;
                     println!("{} {} {}",host,wasm_path,param );
@@ -252,7 +260,34 @@ tokio::spawn(async move {
                           // victxclone.send(Bytes::copy_from_slice(&total_bytes)).await;
                           let str_wasm_full = format!("GETWASM {} {} {}",myaddr,param,String::from_utf8(total_bytes).unwrap()).to_string();
 
+                        if &host!="local" {
+                          let tx_p = nbb_clone.get(&(  host   )).unwrap() ;
                           tx_p.send(str_wasm_full).await.expect("could not send");
+                        }
+                        else
+                        {
+
+
+                                      tokio::spawn(async move {
+                                              let swasm_bytes =  str_wasm_full.as_bytes();
+                                              let param = param.parse::<i32>().unwrap();
+                                              // println!("wasm byte len:{},from: {}, func param: {}",swasm_bytes.len(),remote_caller,param);
+                                              println!("wasm byte from: local, func param: {}",param);
+                                              let store = Store::default();
+                                                  let module = Module::from_binary(store.engine(), swasm_bytes).unwrap();
+                                                  let instance = Instance::new(&store, &module, &[]).unwrap();
+                                                  // Invoke `gcd` export
+                                                  let func = instance
+                                                      .get_func("fib")
+                                                      .ok_or(anyhow::format_err!("failed to find `gcd` function export")).unwrap()
+                                                      .get1::<i32, i32>().unwrap();
+                                                  let res = func(param ).unwrap();
+                                                  println!("Local Result: func({}) = {}", param,res );
+                                        });
+
+
+
+                        }
 
                         },                                                  
                         Err(error) => {                                                    
@@ -264,7 +299,7 @@ tokio::spawn(async move {
                             });
 
 
-
+                            
 
                     
                   },
