@@ -4,7 +4,7 @@ https://emscripten.org/docs/getting_started/downloads.html
 write ur c code
 
 compile:
-emcc -O2 -s WASM=1 -s SIDE_MODULE=1 -o add.wasm add.c
+emcc -O2 -s WASM=1 -s SIDE_MODULE=1 -o fib.wasm fib.c
 
 
 use *.wasm in rustsys
