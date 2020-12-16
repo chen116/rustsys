@@ -31,8 +31,8 @@ fn main() {
     // and returns one u32 value.
     let add_one: NativeFunc<u32, u32> = instance
         .exports
-        .get_native_function("func")
-        .expect("func function in Wasm module");
+        .get_native_function("fib")
+        .expect("add_one function in Wasm module");
     let result = add_one.call(25).unwrap();
 
     // Log the result
