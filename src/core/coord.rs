@@ -152,7 +152,7 @@ apps: app::App  )
 
                             let info = format!("RESPONSE {}({})={}",appname,value,res_str);
                             
-                            if remote_caller != "none".to_string() && remote_caller!=myaddr_clone
+                            if remote_caller != "none".to_string() && remote_caller != myaddr_clone
                             {
                                
                               let tx_p = nb_clone.get(&( remote_caller   )).unwrap() ;
@@ -203,7 +203,7 @@ tokio::spawn(async move {
                       match func(param )
                       {
                         Ok(res ) => {
-                              println!("Result: func({}) = {}", param,res );
+                              println!("Result func({}) = {}", param,res );
                               tokio::spawn(async move {
 
                                                    let info = format!("RESPONSE func({}) = {}", param,res);
@@ -278,7 +278,7 @@ tokio::spawn(async move {
                                                           .ok_or(anyhow::format_err!("failed to find function export")).unwrap()
                                                           .get1::<i32, i32>().unwrap();
                                                       let res = func(param ).unwrap();
-                                                      println!("Local Result: func({}) = {}", param,res );
+                                                      println!("RESPONSE func({}) = {}", param,res );
                                             });
 
 
@@ -305,7 +305,7 @@ tokio::spawn(async move {
 
                    Some("RESPONSE") => { 
 
-                     println!("RESPONSE {}",parts.next().unwrap());
+                     println!("REMOTE RESPONSE {}",parts.next().unwrap());
                    
                    
                    }
