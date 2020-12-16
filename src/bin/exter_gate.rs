@@ -42,7 +42,7 @@ pub async fn main() ->Result<(), Box<dyn Error>> {
     let (victx, mut vicrx) = mpsc::channel(32);
 
     let addr = format!("{}:{}", remote_host.host.as_str(),remote_host.port.as_str());
-    println!("connecting to {}",addr);
+    println!("gateway connecting to host {}",addr);
 
     let stream = TcpStream::connect(addr).await?;
 
