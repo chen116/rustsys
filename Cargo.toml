@@ -9,7 +9,7 @@ edition = "2018"
 
 
 [[bin]]
-name = "exter_in"
+name = "exter_gate"
 path = "src/bin/exter_gate.rs"
 
 
