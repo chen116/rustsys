@@ -2020,7 +2020,6 @@ dependencies = [
  "signal-hook-registry",
  "slab",
  "tokio-macros",
- "tracing",
  "winapi 0.3.9",
 ]
 
