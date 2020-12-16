@@ -274,7 +274,7 @@ tokio::spawn(async move {
                                                       let instance = Instance::new(&store, &module, &[]).unwrap();
                                                       // Invoke `gcd` export
                                                       let func = instance
-                                                          .get_func("func")
+                                                          .get_func("fib")
                                                           .ok_or(anyhow::format_err!("failed to find function export")).unwrap()
                                                           .get1::<i32, i32>().unwrap();
                                                       let res = func(param ).unwrap();

@@ -9,10 +9,10 @@
 // return t1;
 // }
 
-int func(int n)
+int fib(int n)
 {
     if (n <= 1)
         return n;
     else
-        return func(n - 1) + func(n - 2);
+        return fib(n - 1) + fib(n - 2);
 }
