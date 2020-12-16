@@ -69,26 +69,19 @@ pub async fn main() ->Result<(), Box<dyn Error>> {
 
       });
 
-            loop {
-                let mut input = String::new();
-               
-                io::stdin().read_line(&mut input).unwrap();
-                input.pop();
-              
-                let total_bytes = input.as_bytes().to_vec();
-                 
+        loop {
+            let mut input = String::new();
+            
+            io::stdin().read_line(&mut input).unwrap();
+            input.pop();
+            
+            let total_bytes = input.as_bytes().to_vec();
+                
 
-                victxclone.send(Bytes::copy_from_slice(&total_bytes)).await.expect("could not send");
+            victxclone.send(Bytes::copy_from_slice(&total_bytes)).await.expect("could not send");
 
-            }
-        
-
-
-
-       
-
-
-
+        }
+    
 
 
     Ok(())

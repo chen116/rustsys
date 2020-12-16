@@ -137,35 +137,8 @@ apps: app::App  )
                     let myaddr_clone = myaddr.clone();
 
                     if host == myaddr_clone {
-                      println!("run here");
-                      if appname == "pi".to_string() {
-                            tokio::spawn(async move {
-                            // Process each socket concurrently.
-                            let mut client = GreeterClient::connect("http://localhost:50050").await.unwrap();
-                            let request = tonic::Request::new(HelloRequest {
-                            name: value.clone(),
-                            });
-                                   let response = client.say_hello(request).await.unwrap();
-                            // println!("RESPONSE {}({})={:?}", appname,value,response.into_inner().message);
-                            let res_str = response.into_inner().message.to_string();
-                            // println!("RESPONSE {}({})={}", appname,value,res_str);
+                           println!("run here");
 
-                            let info = format!("RESPONSE {}({})={}",appname,value,res_str);
-                            
-                            if remote_caller != "none".to_string()
-                            {
-                               
-                              let tx_p = nb_clone.get(&( remote_caller   )).unwrap() ;
-                              tx_p.send(   info.to_string()).await.expect("could not send");
-                            }
-                            else{
-                              println!("{}",info );
-                            }
-                       
-                        });
-                      }
-                      else
-                      {
                             tokio::spawn(async move {
                             // Process each socket concurrently.
                             let mut client = GreeterClient::connect("http://localhost:50051").await.unwrap();
@@ -190,13 +163,6 @@ apps: app::App  )
                             }
                        
                         });
-
-
-                      }
-
-
-
-
                     }else{
                     let tx_p = nb.get(&(host)).unwrap() ;
                     let info = format!("SEND2APP {} {} {}",appname,value,myaddr.clone());
@@ -244,7 +210,7 @@ tokio::spawn(async move {
                       
                       let tx_p = nbbb.get(&( remote_caller   )).unwrap() ;
                       tx_p.send(   info.to_string()).await.expect("could not send");
-});
+                            });
                         },
                         _=>{
                           println!("not good wasm");
@@ -314,7 +280,7 @@ tokio::spawn(async move {
                    }
 
                  _ => {      
-                   println!("command unknown");         
+                   println!("unknown command, try again");         
                   }
              }
 
