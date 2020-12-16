@@ -152,7 +152,7 @@ apps: app::App  )
 
                             let info = format!("RESPONSE {}({})={}",appname,value,res_str);
                             
-                            if remote_caller != "none".to_string()
+                            if remote_caller != "none".to_string() && remote_caller!=myaddr_clone
                             {
                                
                               let tx_p = nb_clone.get(&( remote_caller   )).unwrap() ;
