@@ -1,48 +1,39 @@
 
-use tokio::net::{TcpListener, TcpStream};
-use tokio::stream::{Stream, StreamExt};
-use tokio::sync::{mpsc, Mutex};
-use tokio_util::codec::{Framed, LinesCodec,BytesCodec, LinesCodecError};
+use tokio::net::{TcpListener};
+use tokio::stream::{ StreamExt};
+use tokio::sync::{mpsc};
+use tokio_util::codec::{Framed,BytesCodec};
 
-use futures::SinkExt;
-use std::collections::HashMap;
-use std::env;
 use std::error::Error;
-use std::io;
-use std::net::SocketAddr;
-use std::pin::Pin;
-use std::sync::Arc;
-use std::task::{Context, Poll};
 use crate::{RX_PORT};
-    use bytes::Bytes;
 
 
 pub async fn hi() -> Result<(), Box<dyn Error>>   {
     println!("hi");
     Ok(())
 }
-struct Shared {
-    peers: HashMap<SocketAddr, String>,
-}
+// struct Shared {
+//     peers: HashMap<SocketAddr, String>,
+// }
 
-impl Shared {
-    /// Create a new, empty, instance of `Shared`.
-    fn new() -> Self {
-        Shared {
-            peers: HashMap::new(),
-        }
-    }
+// impl Shared {
+//     /// Create a new, empty, instance of `Shared`.
+//     fn new() -> Self {
+//         Shared {
+//             peers: HashMap::new(),
+//         }
+//     }
 
-    /// Send a `LineCodec` encoded message to every peer, except
-    /// for the sender.
-    async fn broadcast(&mut self, sender: SocketAddr, message: &str) {
-        // for peer in self.peers.iter_mut() {
-        //     if *peer.0 != sender {
-        //         let _ = peer.1.send(message.into());
-        //     }
-        // }
-    }
-}
+//     /// Send a `LineCodec` encoded message to every peer, except
+//     /// for the sender.
+//     async fn broadcast(&mut self, sender: SocketAddr, message: &str) {
+//         // for peer in self.peers.iter_mut() {
+//         //     if *peer.0 != sender {
+//         //         let _ = peer.1.send(message.into());
+//         //     }
+//         // }
+//     }
+// }
 pub async fn run(addr_clone: String,p1: mpsc::Sender<String>) -> Result<(), Box<dyn Error>> {
     // Allow passing an address to listen on as the first argument of this
     // program, but otherwise we'll just set up our TCP listener on

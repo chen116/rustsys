@@ -147,10 +147,10 @@ apps: app::App  )
                             });
                                    let response = client.say_hello(request).await.unwrap();
                             // println!("RESPONSE {}({})={:?}", appname,value,response.into_inner().message);
-                            let resStr = response.into_inner().message.to_string();
-                            // println!("RESPONSE {}({})={}", appname,value,resStr);
+                            let res_str = response.into_inner().message.to_string();
+                            // println!("RESPONSE {}({})={}", appname,value,res_str);
 
-                            let info = format!("RESPONSE {}({})={}",appname,value,resStr);
+                            let info = format!("RESPONSE {}({})={}",appname,value,res_str);
                             
                             if remote_caller != "none".to_string()
                             {
@@ -174,10 +174,10 @@ apps: app::App  )
                             });
                             let response = client.say_hello(request).await.unwrap();
                             // println!("RESPONSE {}({})={:?}", appname,value,response.into_inner().message);
-                            let resStr = response.into_inner().message.to_string();
-                            // println!("RESPONSE {}({})={}", appname,value,resStr);
+                            let res_str = response.into_inner().message.to_string();
+                            // println!("RESPONSE {}({})={}", appname,value,res_str);
 
-                            let info = format!("RESPONSE {}({})={}",appname,value,resStr);
+                            let info = format!("RESPONSE {}({})={}",appname,value,res_str);
                             
                             if remote_caller != "none".to_string()
                             {

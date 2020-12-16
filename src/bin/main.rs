@@ -108,7 +108,7 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
 
     let addr_clone = addr.clone();
     let p1_clone = p1.clone();
-    let rx = tokio::spawn(async move { 
+    let _rx = tokio::spawn(async move { 
         rx::run(addr_clone,p1_clone).await.expect("fail");
     });
 

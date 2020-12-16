@@ -11,14 +11,14 @@ pub struct App {
 impl App {
     pub fn new() -> App {
 
-        let mut map: HashMap<String, String> = HashMap::new();
+        let  map: HashMap<String, String> = HashMap::new();
         let shared = Arc::new( Mutex::new( map));
         App { shared: shared }
     }
 
     pub fn set(&self, key: String, value: String) {
                 let mut state = self.shared.lock().unwrap();
-                let prev = state.insert(
+                let _prev = state.insert(
                     key,
                     value
                 );
@@ -43,7 +43,3 @@ impl App {
   
 }
 
-fn do_it(map: &mut HashMap<String, String>) {
-
-    map.clear();
-}

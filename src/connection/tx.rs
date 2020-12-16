@@ -1,17 +1,13 @@
 use tokio::net::{ TcpStream};
-use tokio::stream::{StreamExt};
-use tokio_util::codec::{Framed, LinesCodec};
 
 use futures::SinkExt;
 use std::error::Error;
-use std::io;
 
 use bytes::Bytes;
-use futures::{future, Sink, Stream};
 use tokio_util::codec::{BytesCodec, FramedRead, FramedWrite};
 
 use tokio::sync::mpsc;
-use crate::{TX_PORT,RX_PORT};
+use crate::{RX_PORT};
 // use tokio::io::AsyncWriteExt;
 
 pub async fn run(addr_clone: String, c2: &mut mpsc::Receiver<String>) -> Result<(), Box<dyn Error>> {
@@ -23,8 +19,8 @@ pub async fn run(addr_clone: String, c2: &mut mpsc::Receiver<String>) -> Result<
     // let (mut victx, mut vicrx) = mpsc::channel(32);
 
 
-    let mut stream = TcpStream::connect(&addr).await?;
-    let (mut r, mut w) = stream.into_split();
+    let  stream = TcpStream::connect(&addr).await?;
+    let ( r,  w) = stream.into_split();
     // let mut sink = FramedWrite::new(w, LinesCodec::new());
     let mut sink = FramedWrite::new(w, BytesCodec::new());
 
@@ -33,7 +29,7 @@ pub async fn run(addr_clone: String, c2: &mut mpsc::Receiver<String>) -> Result<
     // on the event of an Error, log the error and end the stream
 
     // let mut source = FramedRead::new(r, LinesCodec::new());
-    let mut source = FramedRead::new(r, BytesCodec::new());
+    let  _source = FramedRead::new(r, BytesCodec::new());
 
 
 
@@ -63,9 +59,9 @@ pub async fn run(addr_clone: String, c2: &mut mpsc::Receiver<String>) -> Result<
         while let Some(mesg) = c2.recv().await {
             // println!("sending {:?}", mesg );
             // sink.send(mesg).await.unwrap();           
-                 let mut input_bytes = mesg.as_bytes().to_vec();
+                 let  input_bytes = mesg.as_bytes().to_vec();
 
-                sink.send(Bytes::copy_from_slice(&input_bytes)).await;
+                sink.send(Bytes::copy_from_slice(&input_bytes)).await.expect("could not send");
 
             // handle details
         }

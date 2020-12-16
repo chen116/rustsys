@@ -12,14 +12,14 @@ pub struct Neighbour {
 impl Neighbour {
     pub fn new() -> Neighbour {
 
-        let mut map: HashMap<String,  mpsc::Sender<String>> = HashMap::new();
+        let  map: HashMap<String,  mpsc::Sender<String>> = HashMap::new();
         let shared = Arc::new( Mutex::new( map));
         Neighbour { shared: shared }
     }
 
     pub fn set(&self, key: String, value:  mpsc::Sender<String>) {
                 let mut state = self.shared.lock().unwrap();
-                let prev = state.insert(
+                let _prev = state.insert(
                     key,
                     value
                 );
@@ -46,7 +46,7 @@ impl Neighbour {
      pub  fn all_neighbours(&self)->Vec<mpsc::Sender<String>>{
         let state = self.shared.lock().unwrap();
         let mut vec = Vec::new();
-        for (key, value) in state.iter() {
+        for (_key, value) in state.iter() {
             // let info = format!("UPDATEAPPS {} {}",appname,host);
             vec.push(value.clone());
         }
@@ -55,7 +55,3 @@ impl Neighbour {
   
 }
 
-fn do_it(map: &mut HashMap<String, String>) {
-
-    map.clear();
-}
