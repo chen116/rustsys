@@ -1,0 +1,52 @@
+[package]
+name = "fogsys"
+version = "0.1.0"
+authors = ["vic <chen116@usc.edu>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+
+[[bin]]
+name = "exter_gate"
+path = "src/bin/exter_gate.rs"
+
+
+[[bin]]
+name = "main"
+path = "src/bin/main.rs"
+
+[dependencies]
+hostname = "^0.3"
+dirs = "3.0.1"
+pnet = "0.26.0"
+structopt = "0.3.14"
+
+
+tokio = { version = "0.3.5", features = ["full"] }
+tokio-util = { version = "0.5.0", features = ["full"] }
+bytes = "0.6"
+futures = "0.3.0"
+
+
+tonic = { git = "https://github.com/hawkw/tonic.git",branch = "eliza/tokio-0.3" }
+prost = { git = "https://github.com/danburkert/prost" }
+async-stream = "0.2"
+prost-types = { git = "https://github.com/danburkert/prost" }
+
+
+
+# The Wasmer API
+wasmer = "1.0.0-alpha01.0"
+# The Cranelift compiler used by the JIT engine
+wasmer-compiler-cranelift = "1.0.0-alpha01.0"
+# The engine we'll use in the API
+wasmer-engine-jit = "1.0.0-alpha01.0"
+
+
+wasmtime = "0.21.0"
+wasmtime-wasi = "0.21.0"
+anyhow = "1"
+
+[build-dependencies]
+tonic-build = { path = "../tonic/tonic-build", features = ["prost"] }
