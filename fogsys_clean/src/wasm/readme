@@ -1,0 +1,11 @@
+install emsdk first
+https://emscripten.org/docs/getting_started/downloads.html
+
+write ur c code
+
+to compile to standalone wasm file:
+
+emcc -O2 -s WASM=1 -s SIDE_MODULE=1 -o fib.wasm fib.c
+
+
+use *.wasm in fogsys with corresponding path

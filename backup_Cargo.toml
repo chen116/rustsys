@@ -1,0 +1,102 @@
+[package]
+name = "rustsys"
+version = "0.1.0"
+authors = ["vic <chen116@usc.edu>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+
+
+[[bin]]
+name = "exter_gate"
+path = "src/bin/exter_gate.rs"
+
+
+[[bin]]
+name = "main"
+path = "src/bin/main.rs"
+
+
+
+[dependencies]
+hostname = "^0.3"
+dirs = "3.0.1"
+tokio = { version = "0.3.5", features = ["full", "tracing"] }
+tracing = "0.1"
+#tracing-subscriber = { version = "0.2.7", default-features = false, features = ["fmt", "ansi", "env-filter", "chrono", "tracing-log"] }
+tokio-util = { version = "0.5.0", features = ["full"] }
+bytes = "0.6"
+futures = "0.3.0"
+http = "0.2"
+serde = "1.0"
+serde_derive = "1.0"
+serde_json = "1.0"
+httparse = "1.0"
+time = "0.1"
+structopt = "0.3.14"
+dns-lookup = "1.0.5"
+get_local_ip = "0.2.1"
+pnet = "0.26.0"
+tonic = { git = "https://github.com/hawkw/tonic.git",branch = "eliza/tokio-0.3" }
+#hyper = { path = "/home/vic/rust/hyper" }
+#hyper = "0.13.9"
+#pretty_env_logger = "0.4"
+h2 =  { git = "https://github.com/hyperium/h2"}
+env_logger = { version = "0.5.3", default-features = false }
+rustls = "0.18"
+tokio-rustls = "0.20.0"
+webpki = "0.21"
+webpki-roots = "0.17"
+
+
+
+
+#tonic = { path = "/home/vic/rust/tonic", features = ["tls"] }
+prost = { git = "https://github.com/danburkert/prost" }
+#tokio = { version = "0.3", features = ["rt-multi-thread", "time", "stream", "fs", "macros", "net"] }
+#futures = { version = "0.3", default-features = false, features = ["alloc"] }
+async-stream = "0.2"
+tower = { git = "https://github.com/tower-rs/tower", version = "0.4" }
+# Required for routeguide
+#serde = { version = "1.0", features = ["derive"] }
+#serde_json = "1.0"
+rand = "0.7"
+# Tracing
+#tracing = "0.1.16"
+#tracing-subscriber = { version = "0.2", features = ["tracing-log"] }
+tracing-attributes = "0.1"
+tracing-futures = "0.2"
+# Required for wellknown types
+prost-types = { git = "https://github.com/danburkert/prost" }
+# Hyper example
+#hyper = { git = "https://github.com/hyperium/hyper", branch = "master" }
+#warp = { version = "0.2", default-features = false }
+#http = "0.2"
+#http-body  = { git = "https://github.com/hyperium/http-body", branch = "master" }
+#pin-project = "0.4.17"
+# Health example
+#tonic-health = { path = "/home/vic/rust/tonic/tonic-health" }
+#listenfd = "0.3"
+
+
+# The Wasmer API
+wasmer = "1.0.0-alpha01.0"
+# The Cranelift compiler used by the JIT engine
+wasmer-compiler-cranelift = "1.0.0-alpha01.0"
+# The engine we'll use in the API
+wasmer-engine-jit = "1.0.0-alpha01.0"
+
+#wasmer-wasi = "1.0.0-beta"
+#wasmer-runtime = "0.17.1"
+
+
+#wasmtime-rust = { git = 'https://github.com/cranestation/wasmtime',branch='main' }
+wasmtime = "0.21.0"
+wasmtime-wasi = "0.21.0"
+anyhow = "1"
+
+[build-dependencies]
+#tonic-build = { path = "/home/vic/rust/tonic/tonic-build", features = ["prost"] }
+tonic-build = { path = "../tonic/tonic-build", features = ["prost"] }
+

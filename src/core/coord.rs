@@ -1,10 +1,9 @@
 
-use tokio::sync::{mpsc, Mutex};
-use crate::datastore::{ets,neighbour,app};
+use tokio::sync::{mpsc};
+use crate::datastore::{neighbour,app};
 
 
 use std::error::Error;
-use tokio::sync::watch;
 use std::process::Command;
 
 
@@ -25,7 +24,12 @@ pub mod hello_world {
 
 async fn create_new_app(app_name: String) -> String {
 // let exec = format!("/home/vic/cpp_grpc/grpc/examples/cpp/helloworld/cmake/build/server_{}",app_name);
-let exec = format!("/home1/chen116/grpc/examples/cpp/helloworld/cmake/build/server_{}",app_name);
+
+                    let exec = format!("{}/grpc/examples/cpp/helloworld/cmake/build/server_{}",
+                    dirs::home_dir().unwrap().into_os_string().into_string().unwrap()
+                    ,app_name).to_string();
+
+
 
 let mut _child = Command::new(exec)
                         .arg("")
@@ -39,7 +43,7 @@ res
 
 
 
-pub async fn run(myaddr_ori: String,c1: &mut mpsc::Receiver<String>, db: ets::SimpleEts, 
+pub async fn run(myaddr_ori: String,c1: &mut mpsc::Receiver<String>, 
 nb: neighbour::Neighbour, dy_tx_p: mpsc::Sender<String> , 
 apps: app::App  ) 
 -> Result<(), Box<dyn Error>>  {
@@ -59,12 +63,12 @@ apps: app::App  )
  
 
 
-                 Some("NEWCLOUDLET") => { 
-                    dy_tx_p.send(parts.next().unwrap().to_string()).await;
+                 Some("NEWHOST") => { 
+                    dy_tx_p.send(parts.next().unwrap().to_string()).await.expect("could not send");
                   },
-                  Some("CLOUDLETS") => { 
+                  Some("HOSTS") => { 
 
-                      println!("Connected Cloudlets:");
+                      println!("Connected HOSTs:");
                       nb.list();
                     // println!("{:?}",nb.get(&("hi".to_string())).unwrap());
                     // println!("LIST {:?}", nb.get(&(  parts.next().unwrap().to_string()   )).unwrap()   );
@@ -79,7 +83,7 @@ apps: app::App  )
                  Some("SEND2HOST") => { 
                     let mut part2s =  (parts.next().unwrap()).splitn(2, ' ');
                     let tx_p = nb.get(&(  part2s.next().unwrap().to_string()   )).unwrap() ;
-                    tx_p.send(part2s.next().unwrap().to_string()).await;
+                    tx_p.send(part2s.next().unwrap().to_string()).await.expect("could not send");
                   },
                  Some("NEWAPP") => { 
                     let app_name = parts.next().unwrap().to_string();
@@ -94,7 +98,7 @@ apps: app::App  )
                     let info = format!("UPDATEAPPS {} {}",app_name.clone(),myaddr);
                     let mut tx_ps = nb.all_neighbours();
                     while let Some(tx_p) = tx_ps.pop() {
-                        tx_p.send(info.to_string()).await;
+                        tx_p.send(info.to_string()).await.expect("could not send");
                     }
   
                   },
@@ -109,13 +113,13 @@ apps: app::App  )
 
                     let appname =  part2s.next().unwrap().to_string() ;
                     let value =  part2s.next().unwrap().to_string() ;
-                    let mut remoteCaller = "none".to_string();
-                          let originHost = part2s.next() ;
-                          match originHost {
+                    let mut remote_caller = "none".to_string();
+                          let origin_host = part2s.next() ;
+                          match origin_host {
                             Some(inner) =>
                             {
                              
-                              remoteCaller = inner.to_string().clone();
+                              remote_caller = inner.to_string().clone();
                             }
                              ,
                             None => {
@@ -123,7 +127,7 @@ apps: app::App  )
                               
                             },
                           }
-                   println!("from HOST {}",remoteCaller);
+                   println!("from HOST {}",remote_caller);
 
 
 
@@ -133,35 +137,8 @@ apps: app::App  )
                     let myaddr_clone = myaddr.clone();
 
                     if host == myaddr_clone {
-                      println!("run here");
-                      if appname == "pi".to_string() {
-                            tokio::spawn(async move {
-                            // Process each socket concurrently.
-                            let mut client = GreeterClient::connect("http://localhost:50050").await.unwrap();
-                            let request = tonic::Request::new(HelloRequest {
-                            name: value.clone(),
-                            });
-                                   let response = client.say_hello(request).await.unwrap();
-                            // println!("RESPONSE {}({})={:?}", appname,value,response.into_inner().message);
-                            let resStr = response.into_inner().message.to_string();
-                            // println!("RESPONSE {}({})={}", appname,value,resStr);
+                           println!("run here");
 
-                            let info = format!("RESPONSE {}({})={}",appname,value,resStr);
-                            
-                            if remoteCaller != "none".to_string()
-                            {
-                               
-                              let tx_p = nb_clone.get(&( remoteCaller   )).unwrap() ;
-                              tx_p.send(   info.to_string()).await;
-                            }
-                            else{
-                              println!("{}",info );
-                            }
-                       
-                        });
-                      }
-                      else
-                      {
                             tokio::spawn(async move {
                             // Process each socket concurrently.
                             let mut client = GreeterClient::connect("http://localhost:50051").await.unwrap();
@@ -170,34 +147,27 @@ apps: app::App  )
                             });
                             let response = client.say_hello(request).await.unwrap();
                             // println!("RESPONSE {}({})={:?}", appname,value,response.into_inner().message);
-                            let resStr = response.into_inner().message.to_string();
-                            // println!("RESPONSE {}({})={}", appname,value,resStr);
+                            let res_str = response.into_inner().message.to_string();
+                            // println!("RESPONSE {}({})={}", appname,value,res_str);
 
-                            let info = format!("RESPONSE {}({})={}",appname,value,resStr);
+                            let info = format!("RESPONSE {}({})={}",appname,value,res_str);
                             
-                            if remoteCaller != "none".to_string()
+                            if remote_caller != "none".to_string() && remote_caller != myaddr_clone
                             {
                                
-                              let tx_p = nb_clone.get(&( remoteCaller   )).unwrap() ;
-                              tx_p.send(   info.to_string()).await;
+                              let tx_p = nb_clone.get(&( remote_caller   )).unwrap() ;
+                              tx_p.send(   info.to_string()).await.expect("could not send");
                             }
                             else{
                               println!("{}",info );
                             }
                        
                         });
-
-
-                      }
-
-
-
-
                     }else{
                     let tx_p = nb.get(&(host)).unwrap() ;
                     let info = format!("SEND2APP {} {} {}",appname,value,myaddr.clone());
 
-                    tx_p.send( info.to_string() ).await;
+                    tx_p.send( info.to_string() ).await.expect("could not send");
                     }
 
 
@@ -222,8 +192,8 @@ tokio::spawn(async move {
 
                       // Invoke `gcd` export
                       let func = instance
-                          .get_func("fib")
-                          .ok_or(anyhow::format_err!("failed to find `gcd` function export")).unwrap()
+                          .get_func("func")
+                          .ok_or(anyhow::format_err!("failed to find function export")).unwrap()
                           .get1::<i32, i32>().unwrap();
 
                       // let res = func(param ).unwrap();
@@ -233,14 +203,14 @@ tokio::spawn(async move {
                       match func(param )
                       {
                         Ok(res ) => {
-                              println!("Result: func({}) = {}", param,res );
+                              println!("Result func({}) = {}", param,res );
                               tokio::spawn(async move {
 
-                                                   let info = format!("RESPONSE {}",res);
+                                                   let info = format!("RESPONSE func({}) = {}", param,res);
                       
                       let tx_p = nbbb.get(&( remote_caller   )).unwrap() ;
-                      tx_p.send(   info.to_string()).await;
-});
+                      tx_p.send(   info.to_string()).await.expect("could not send");
+                            });
                         },
                         _=>{
                           println!("not good wasm");
@@ -268,7 +238,15 @@ tokio::spawn(async move {
 
 
 
-                    let tx_p = nb.get(&(  host   )).unwrap() ;
+
+
+
+
+                  let nbb_clone=nbb.clone();
+
+
+
+
                     tokio::spawn(async move {
                     let file = File::open(&wasm_path).await;
                     println!("{} {} {}",host,wasm_path,param );
@@ -277,12 +255,35 @@ tokio::spawn(async move {
                      match file {                                                
                         Ok(mut readfile) => { 
                           let mut total_bytes = vec![];
-                          readfile.read_to_end(&mut total_bytes).await;
+                          readfile.read_to_end(&mut total_bytes).await.expect("could not read");
                           println!("{:?} {}",total_bytes,total_bytes.len() );
-                          // victxclone.send(Bytes::copy_from_slice(&total_bytes)).await;
-                          let str_wasm_full = format!("GETWASM {} {} {}",myaddr,param,String::from_utf8(total_bytes).unwrap()).to_string();
 
-                          tx_p.send(str_wasm_full).await;
+                            if &host!="local" {
+                              let str_wasm_full = format!("GETWASM {} {} {}",myaddr,param,String::from_utf8(total_bytes).unwrap()).to_string();
+                              let tx_p = nbb_clone.get(&(  host   )).unwrap() ;
+                              tx_p.send(str_wasm_full).await.expect("could not send");
+                            }
+                            else
+                            {
+                                          tokio::spawn(async move {
+                                                  let param = param.parse::<i32>().unwrap();
+                                                  // println!("wasm byte len:{},from: {}, func param: {}",swasm_bytes.len(),remote_caller,param);
+                                                  println!("wasm byte from: local, func param: {}",param);
+                                                  let store = Store::default();
+                                                      let module = Module::from_binary(store.engine(), &total_bytes).unwrap();
+                                                      let instance = Instance::new(&store, &module, &[]).unwrap();
+                                                      // Invoke `gcd` export
+                                                      let func = instance
+                                                          .get_func("func")
+                                                          .ok_or(anyhow::format_err!("failed to find function export")).unwrap()
+                                                          .get1::<i32, i32>().unwrap();
+                                                      let res = func(param ).unwrap();
+                                                      println!("RESPONSE func({}) = {}", param,res );
+                                            });
+
+
+
+                            }
 
                         },                                                  
                         Err(error) => {                                                    
@@ -294,7 +295,7 @@ tokio::spawn(async move {
                             });
 
 
-
+                            
 
                     
                   },
@@ -304,97 +305,22 @@ tokio::spawn(async move {
 
                    Some("RESPONSE") => { 
 
-                     println!("RESPONSE {}",parts.next().unwrap());
+                     println!("REMOTE RESPONSE {}",parts.next().unwrap());
                    
                    
                    }
 
-                 _ => {               
-                let wasm_string = parts.next().unwrap().to_string();
- let swasm_bytes =  wasm_string.as_bytes();
-
- println!("wasm byte len:{}",swasm_bytes.len());
- let store = Store::default();
-    let module = Module::from_binary(store.engine(), swasm_bytes)?;
-    let instance = Instance::new(&store, &module, &[])?;
-
-    // Invoke `gcd` export
-    let func = instance
-        .get_func("fib")
-        .ok_or(anyhow::format_err!("failed to find `gcd` function export"))?
-        .get1::<i32, i32>()?;
-
-    println!("fib({}) = {}", 40, func(40 )?);
-
-
-
-
-
-
-                        let db = db.clone();
-                        // Like with other small servers, we'll `spawn` this client to ensure it
-                        // runs concurrently with all other clients. The `move` keyword is used
-                        // here to move ownership of our db handle into the async closure.
-                        tokio::spawn(async move {
-                        // Since our protocol is line-based we use `tokio_codecs`'s `LineCodec`
-                        // to convert our stream of bytes, `socket`, into a `Stream` of lines
-                        // as well as convert our line based responses into a stream of bytes.
-                        // Here for every line we get back from the `Framed` decoder,
-                        // we parse the request, and if it's valid we generate a response
-                        // based on the values in the database.
-                        let response = db.handle_request(&mesg.as_str());
-                        let response = response.serialize();
-                        println!("response others: {}",response);
-
-                    // The connection will be closed at this point as `lines.next()` has returned `None`.
-                    });}
+                 _ => {      
+                   println!("unknown command, try again");         
+                  }
              }
 
     
 
                 
-                // let db = db.clone();
-                // tokio::spawn(async move {
-                //     let response = db.handle_request(&mesg.as_str());
-                //     let response = response.serialize();
-                //     println!("response: {}",response);
-                // });
-
-            // victx.send(mesg).await;
-            // handle details
+            
         }
 
 
 Ok(())
 }
-
-// fn parse(input: &str) -> Result<Request, String> {
-//         let mut parts = input.splitn(3, ' ');
-//         match parts.next() {
-//             Some("GET") => {
-//                 let key = parts.next().ok_or("GET must be followed by a key")?;
-//                 if parts.next().is_some() {
-//                     return Err("GET's key must not be followed by anything".into());
-//                 }
-//                 Ok(Request::Get {
-//                     key: key.to_string(),
-//                 })
-//             }
-//             Some("SET") => {
-//                 let key = match parts.next() {
-//                     Some(key) => key,
-//                     None => return Err("SET must be followed by a key".into()),
-//                 };
-//                 let value = match parts.next() {
-//                     Some(value) => value,
-//                     None => return Err("SET needs a value".into()),
-//                 };
-//                 Ok(Request::Set {
-//                     key: key.to_string(),
-//                     value: value.to_string(),
-//                 })
-//             }
-//             Some(cmd) => Err(format!("unknown command: {}", cmd)),
-//             None => Err("empty input".into()),
-//         }
-//     }

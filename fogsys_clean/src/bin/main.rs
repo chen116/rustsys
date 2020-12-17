@@ -1,10 +1,10 @@
-// use rustsys::{server,client,stdcli};
+// use fogsys::{server,client,stdcli};
 use std::error::Error;
 use std::env;
 use tokio::sync::mpsc;
-use rustsys::datastore::{neighbour,app};
-use rustsys::connection::{rx,dy_tx,exter_in};
-use rustsys::core::{coord};
+use fogsys::datastore::{neighbour,app};
+use fogsys::connection::{rx,dy_tx,gateway};
+use fogsys::core::{coord};
 use pnet::datalink;
 
 
@@ -13,8 +13,8 @@ use pnet::datalink;
 
 use structopt::StructOpt;
 #[derive(StructOpt, Debug)]
-#[structopt(name = "fogsys-server", version = env!("CARGO_PKG_VERSION"), author = env!("CARGO_PKG_AUTHORS"), about = "rustsys")]
-struct DiscoveryOrLocal {
+#[structopt(name = "fogsys-server", version = env!("CARGO_PKG_VERSION"), author = env!("CARGO_PKG_AUTHORS"), about = "fogsys")]
+struct CARCOrLocal {
 
 
 
@@ -33,11 +33,10 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
 
     let mut addr = "127.0.0.1".to_string();
     
-    let compute_env = DiscoveryOrLocal::from_args();
-
+    let compute_env = CARCOrLocal::from_args();
+    // setting current cloudlet addr based on given env
     match compute_env.host.as_str() {
         "local" => {
-
             for iface in datalink::interfaces() {
                 // println!("{:?}",iface);
                 match iface.is_up(){
@@ -59,6 +58,7 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
             }
 
         },
+        // anything else will assumed to be in carc, try to get node hostname
         _ => {
             let name = hostname::get()?;
             addr = name.to_string_lossy().to_string().clone();
@@ -73,51 +73,31 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
 
 
 
-    // let addr = addr + ":6142";
     println!("addr is: {}",addr);
-    let ( p1, mut c1) = mpsc::channel(32);
-    let ( p2, mut c2) = mpsc::channel(32);
-    // let (mut p3, mut c3) = mpsc::channel(32);
+    let ( p1, mut c1) = mpsc::channel(32); // information message passing producer consumer pair where producer: Rx,Gateway, consumer: Coordinator 
+    let ( p2, mut c2) = mpsc::channel(32); // information message passing producer consumer pair where producer: Coordination, consumer: Dynamic Tx
 
 
-    let nb = neighbour::Neighbour::new();
-    let apps = app::App::new();
-    // nb.set("hi".to_string(), p2);
-    // let p3 = nb.get(&("hi".to_string())).unwrap();
-    // let p4=p3.clone();
-    // nb.set("hi".to_string(), p4);
-    // println!("{:?}",nb.get(&("hi".to_string())).unwrap());
+    let nb = neighbour::Neighbour::new();  // Neighbouring cloudlet Map
+    let apps = app::App::new();            // Grpc App Map
 
 
-    // let addr = env::args()
-    //     .nth(1)
-    //     .unwrap_or_else(|| "127.0.0.1:6142".to_string());
-
-    // Bind a TCP listener to the socket address.
-    // Note that this is the Tokio TcpListener, which is fully async.
-    // let listener = TcpListener::bind(&addr).await?;
-    // let ser = tokio::spawn(async move { 
-    //     server::run(listener,addr).await;
-    // });
-
+    // start Gateway
     let addr_clone = addr.clone();
     let p1_clone = p1.clone();
-    let _exter_in = tokio::spawn(async move { 
-        exter_in::run(addr_clone,p1_clone).await.expect("fail");
+    let _gateway = tokio::spawn(async move { 
+        gateway::run(addr_clone,p1_clone).await.expect("fail");
     });
 
+    // start Rx
     let addr_clone = addr.clone();
     let p1_clone = p1.clone();
     let _rx = tokio::spawn(async move { 
         rx::run(addr_clone,p1_clone).await.expect("fail");
     });
 
-    // let addr_clone = addr.clone();
-    // let p1_clone = p1.clone();
-    // let app_rx = tokio::spawn(async move { 
-    //     app_rx::run(addr_clone,p1_clone).await;
-    // });
 
+    // start Coordinator
     let nb_clone = nb.clone();
     let apps_clone = apps.clone();
     let coord = tokio::spawn(async move { 
@@ -125,13 +105,11 @@ pub async fn main() -> Result<(), Box<dyn Error>>  {
     });
 
 
-
+    // start Dynamic Tx
     let nb_clone = nb.clone();
     let _dy_tx = tokio::spawn(async move { 
         dy_tx::run(nb_clone,&mut c2).await.expect("fail");
     });
-
-
 
     let _done = coord.await?;
 
